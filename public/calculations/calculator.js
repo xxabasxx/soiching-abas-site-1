@@ -95,8 +95,19 @@
   try {
     var carried = location.hash.indexOf('#project=') === 0 ? decodeURIComponent(location.hash.slice(9)) : null;
     var saved = carried || localStorage.getItem(storageKey);
+    // Ignore cached project name if switching entirely different modules (e.g. flyback to motor)
+    if (saved) {
+      try {
+        var parsed = JSON.parse(saved);
+        var expectedTopology = module.standaloneModule ? (module.topology || moduleId) : (module.topology || E.topology);
+        if (parsed.topology !== expectedTopology) { saved = null; }
+      } catch(e) {}
+    }
     if (saved && saved.length < 100000) {
-      var initial = validateProject(JSON.parse(saved));
+      var parsed = JSON.parse(saved);
+      var expectedTopology = module.standaloneModule ? (module.topology || moduleId) : (module.topology || E.topology);
+      if (parsed.topology !== expectedTopology) { throw new Error('Topology mismatch, ignoring cache'); }
+      var initial = validateProject(parsed);
       state = initial.values; configuration = initial.configuration; projectName = initial.name; notes = initial.notes;
     }
     if (carried) { try { history.replaceState(null, '', location.pathname + location.search); } catch (error) { /* Some file origins do not support replaceState. */ } }
@@ -278,7 +289,7 @@
       if (group.start !== index) return;
       var heading = outputs.querySelector('[data-stage="' + groupIndex + '"]');
       if (!heading) return;
-      heading.innerHTML = '<th colspan="6"><div><span class="stage-marker" dir="ltr">' + String(groupIndex + 1).padStart(2, '0') + '</span><span>' + esc(group.title) + '</span><small data-stage-count="' + groupIndex + '" data-start="' + group.start + '" data-total="' + group.length + '"></small></div></th>';
+      heading.innerHTML = '<th colspan="6"><div><span class="stage-marker" dir="ltr">' + String(groupIndex + 1).padStart(2, '0') + '</span><span>' + esc(translate(group.title)) + '</span><small data-stage-count="' + groupIndex + '" data-start="' + group.start + '" data-total="' + group.length + '"></small></div></th>';
       heading.hidden = false;
     });
     // Future rows contain no text, formula, tooltip, result or accessible label until this point.
