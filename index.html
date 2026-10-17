@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#100e15" />
+    <meta name="description" content="ABAS SOFT | آزمایشگاه طراحی منابع تغذیه سوئیچینگ. Bilingual power supply design worksheets." />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>ABAS SOFT | Power Supply Design Lab</title>
+  </head>
+  <body>
+    <div id="root">
+      <main style="box-sizing:border-box;min-height:100vh;margin:0;padding:64px 24px;background:#100e15;color:#eeeaf3;font-family:Tahoma,Arial,sans-serif;text-align:center;line-height:2.2">
+        <span style="font-size:11px;letter-spacing:3px;color:#d8a77f" dir="ltr">POWER DESIGN LAB</span>
+        <h1 style="margin:16px 0;font-size:32px" dir="ltr">ABAS SOFT</h1>
+        <p>در حال آماده‌سازی صفحه / Preparing your workspace...</p>
+        <p style="font-size:13px;color:#b9a6c4">اگر صفحه باز نشد، نسخه مستقل را باز کنید. این نسخه به سرور یا اینترنت نیاز ندارد.</p>
+        <a id="offline-fallback" href="./offline.html" style="display:inline-block;margin-top:16px;padding:10px 24px;border-radius:6px;background:#a282c8;color:#160d22;text-decoration:none">نسخه آفلاین / Open offline edition</a>
+        <noscript><p>برای اجرای مستقیم از سورس، <a href="./public/offline.html" style="color:#d8a77f">public/offline.html</a> را باز کنید.</p></noscript>
+      </main>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Source TSX cannot run through file://. The standalone page needs no scripts at all.
+      (function () {
+        if (window.location.protocol !== 'file:') return;
+        var entries = document.querySelectorAll('script[type="module"][src]');
+        var isSource = false;
+        for (var i = 0; i < entries.length; i++) {
+          if (/\/src\/main\.tsx(?:\?|$)/.test(entries[i].getAttribute('src') || '')) isSource = true;
+        }
+        var path = isSource ? './public/offline.html' : './offline.html';
+        var link = document.getElementById('offline-fallback');
+        if (link) link.setAttribute('href', path);
+        window.location.replace(path + window.location.search + window.location.hash);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#100e15" />
+    <meta name="volta-offline" content="standalone-v2" />
+    <meta name="volta-offline-motion" content="native-v1" />
+    <meta name="description" content="ABAS SOFT | Bilingual power supply design lab. آزمایشگاه دو‌زبانه طراحی منابع تغذیه." />
+    <link rel="icon" href="./favicon.svg" />
+    <title>ABAS SOFT | Power Supply Design Lab</title>
+    <script src="./i18n.js"></script>
+    <script src="./i18n-dom.js"></script>
+    <!-- OFFLINE_FONT_STYLES -->
+    <style>
+      :root{font-family:'Vazirmatn Variable',Tahoma,Arial,sans-serif;color:#eeeaf3;background:#100e15;color-scheme:dark;-webkit-font-smoothing:antialiased;--copper:#d8a77f;--line:#c9b6e017}
+      *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;font-size:14px}a{color:inherit;text-decoration:none}a,summary{outline-offset:5px}a:focus-visible,summary:focus-visible{outline:2px solid var(--copper)}h1,h2,h3,p{margin:0}svg{display:block;flex-shrink:0}img{display:block;max-width:100%}::selection{background:#7655a9;color:white}.site-shell{overflow:clip;min-height:100vh}.site-container{width:min(1240px,calc(100% - 112px));margin-inline:auto}.skip-link{position:fixed;z-index:50;right:10px;top:10px;padding:12px 20px;background:var(--copper);color:#1e1527;border-radius:5px;transform:translateY(-160%)}.skip-link:focus{transform:none}
+      .site-header{position:relative;z-index:3;border-bottom:1px solid var(--line);background:#100e15}.header-inner{display:flex;align-items:center;justify-content:space-between;min-height:84px;gap:24px}.brand{display:flex;align-items:center;gap:11px}.brand-mark{width:39px;height:39px;color:var(--copper)}.brand-type{display:flex;flex-direction:column;align-items:flex-start}.brand-name{font-size:30px;font-weight:800;line-height:1.15;color:#eee8ef}.brand-dot{color:var(--copper)}.brand-caption{font-size:6.5px;letter-spacing:2.7px;color:#9b849a;margin-top:8px;line-height:1}.main-nav{display:flex;gap:37px}.main-nav a{font-size:12px;color:#aa99b7;padding:15px 0;transition:color .2s}.main-nav a:hover{color:#e5c7ad}.header-guide{display:flex;align-items:center;gap:10px;border:1px solid #ba9dd62e;padding:11px 15px;border-radius:6px;color:#c4aecf;font-size:10.5px}.header-guide:hover{background:#211828;border-color:#ba9dd661}
+      .hero{position:relative;isolation:isolate;min-height:436px;background:#0c0910;overflow:hidden}.hero-image,.hero-shading{position:absolute;inset:0;z-index:-2}.hero-image{animation:photo-arrive 1.3s ease both}.hero-image img{width:100%;height:100%;object-fit:cover;object-position:50% 49%}.hero-shading{z-index:-1;background:linear-gradient(90deg,transparent 36%,#0c091035 55%,#0e0a12ce 85%,#0e0a12e0),linear-gradient(0deg,#100e15,transparent 24%,transparent 92%,#100e1538)}.hero-inner{min-height:436px;display:flex;align-items:center}.hero-copy{width:49%;padding:29px 0 39px;animation:arrive .8s ease both}.hero-eyebrow{display:flex;align-items:center;gap:11px;font-size:10.5px;color:#bda0bd;margin-bottom:9px;line-height:1.8}.hero-eyebrow span{width:24px;height:1px;background:var(--copper)}.hero-wordmark{display:block;font-size:88px;line-height:1.25;font-weight:850;letter-spacing:-4px;color:#f3ecf3}.hero-wordmark>span{color:var(--copper);margin-right:4px}.hero-headline{display:block;font-size:clamp(25px,2.35vw,34px);line-height:1.8;font-weight:650;letter-spacing:-.75px;margin-top:6px;white-space:nowrap}.hero-headline em{font-style:normal;color:#d8a87f}.hero-description{font-size:13px;line-height:2.1;color:#a79aaa;margin-top:10px}.hero-actions{display:flex;align-items:center;gap:28px;margin-top:25px}.primary-button{display:inline-flex;align-items:center;justify-content:center;gap:29px;min-height:45px;padding:11px 19px;border:1px solid #c0a3e484;border-radius:6px;background:#a282c8;color:#160d22;font-size:11.7px;font-weight:600;transition:background .25s}.primary-button:hover{background:#b896db}.primary-button svg{transition:transform .25s}.primary-button:hover svg{transform:translateX(-3px)}.hero-secondary{display:flex;align-items:center;gap:10px;color:#b3a2bf;font-size:11px}.hero-secondary:hover{color:#e2c5ed}
+      .calculations-section{padding:39px 0 53px;background:#131017;border-top:1px solid #c9b6e00c;scroll-margin-top:25px}.section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;margin-bottom:25px}.section-eyebrow{display:flex;align-items:center;gap:8px;font-size:9px;color:#ae899e;line-height:1.6}.section-eyebrow>span{width:13px;height:1px;background:#ad8271}.section-heading h2{font-size:24px;line-height:1.6;font-weight:640;margin-top:7px;color:#e3dce9}.section-heading h2>span{color:#ce9e7e}.section-heading>p{font-size:11px;color:#96869f;line-height:2}.calculations-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}.calculation-card{--card-accent:#b392e2;--accent-rgb:179,146,226;position:relative;display:flex;flex-direction:column;min-width:0;min-height:276px;padding:19px 21px 17px;border:1px solid rgba(var(--accent-rgb),.17);border-radius:10px;background:radial-gradient(ellipse at 80% 0%,rgba(var(--accent-rgb),.07),transparent 75%),#1a151f;overflow:hidden;transition:translate .3s,border-color .3s,box-shadow .3s;animation:arrive .7s ease both}.card-transformer{--card-accent:#dca678;--accent-rgb:220,166,120;animation-delay:.07s}.card-switching{--card-accent:#8daeda;--accent-rgb:141,174,218;animation-delay:.14s}.card-output{--card-accent:#8bbcab;--accent-rgb:139,188,171;animation-delay:.21s}.calculation-card:hover{translate:0 -5px;border-color:rgba(var(--accent-rgb),.5);box-shadow:0 12px 36px #0000002b}.calculation-card:focus-visible{outline-color:var(--card-accent)}.card-topline{display:flex;align-items:center;justify-content:space-between;gap:10px}.card-english{color:rgba(var(--accent-rgb),.73);font-size:7.6px;letter-spacing:1.05px;line-height:1.6}.card-number{color:rgba(var(--accent-rgb),.48);font-size:23px;font-weight:300;line-height:1}.card-circuit{height:80px;display:flex;align-items:center;margin:8px 0 5px;color:var(--card-accent);opacity:.85;transition:opacity .25s,transform .25s}.card-circuit svg{width:100%;max-height:76px}.calculation-card:hover .card-circuit{opacity:1;transform:translateY(-2px)}.calculation-card h3{font-size:16.5px;line-height:1.8;font-weight:620;color:#ede3f0;overflow-wrap:anywhere}.calculation-card>p{color:#a291ad;font-size:10.9px;line-height:2;margin:6px 0 17px}.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:13px;border-top:1px solid rgba(var(--accent-rgb),.1);color:var(--card-accent);font-size:10.7px}.card-arrow{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(var(--accent-rgb),.18);border-radius:50%}.card-arrow svg{transition:transform .25s}.calculation-card:hover .card-arrow svg{transform:translate(-2px,-2px)}
+      .about-section{background:#100d14;border-block:1px solid var(--line);padding:45px 0;scroll-margin-top:30px}.about-inner{display:grid;grid-template-columns:1fr 1.1fr;gap:80px;align-items:center}.about-heading .section-eyebrow{width:fit-content;font-size:7.5px;letter-spacing:1.8px;color:#956b89}.about-heading h2{font-size:25px;line-height:1.7;font-weight:580;color:#d9cbdc;margin-top:13px}.about-heading h2>span{color:#96779f}.about-copy{max-width:440px;margin-right:auto}.about-copy p{font-size:12px;line-height:2.3;color:#a38caa}.about-copy>a{display:inline-flex;align-items:center;gap:12px;font-size:10.5px;color:#ccaa97;margin-top:17px}.guides{background:#100d14;padding:18px 0}.guides details{padding:13px 0;border-bottom:1px solid var(--line);scroll-margin-top:20px}.guides details:last-child{border-bottom:0}.guides summary{cursor:pointer;color:#b59cc0;font-size:11px;line-height:2}.guide-content{max-width:740px;padding:12px 0 5px;color:#ab94b6;font-size:11px;line-height:2.2}.guide-content p+p{margin-top:12px}.guide-content code{font-family:monospace;color:#d4b38a;display:inline-block;direction:ltr;font-size:11px}.file-list{display:grid;grid-template-columns:1fr 1fr;gap:6px 25px;list-style:none;padding:0}.site-footer{padding:28px 0;background:#0e0b12}.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:30px}.brand-compact .brand-mark{width:32px;height:32px}.brand-compact .brand-name{font-size:24px}.brand-compact .brand-caption{font-size:5.5px;letter-spacing:2px;margin-top:5px}.footer-inner>p{font-size:9px;color:#928098;text-align:center;line-height:1.8}.footer-inner>p span{display:block;font-size:6.4px;letter-spacing:1.5px;color:#65516e;margin-top:9px}.footer-actions{display:flex;align-items:center;gap:23px}.footer-actions>a{display:flex;align-items:center;gap:7px;font-size:9px;color:#a385ae}.back-to-top{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid #ab84bf25;border-radius:50%}
+      @keyframes arrive{from{opacity:.3;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes photo-arrive{from{opacity:.45;transform:scale(1.025)}to{opacity:1;transform:scale(1)}}
+      @media(min-width:1650px){.site-container{width:min(1370px,calc(100% - 160px))}.hero,.hero-inner{min-height:504px}.hero-wordmark{font-size:103px}.hero-headline{font-size:38px}.calculation-card{min-height:296px;padding:23px 25px 20px}.calculation-card h3{font-size:18px}}
+      @media(max-width:1200px){.site-container{width:calc(100% - 72px)}.hero-headline{font-size:28px}.hero-wordmark{font-size:83px}.hero-description{font-size:12px}.calculations-grid{gap:14px}.calculation-card{padding-inline:17px}.card-english{font-size:6.8px;letter-spacing:.7px}.calculation-card h3{font-size:15px}}
+      @media(max-width:1050px){.site-container{width:calc(100% - 64px)}.hero,.hero-inner{min-height:413px}.hero-copy{width:52%}.hero-headline{font-size:25px}.hero-wordmark{font-size:81px}.hero-description{font-size:11.5px}.main-nav{gap:26px}.main-nav a{font-size:11px}.calculations-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.calculation-card{min-height:290px;padding:23px 27px 19px}.card-circuit{height:85px;max-width:300px;width:100%;margin-inline:auto}.card-english{font-size:8px;letter-spacing:1.2px}.calculation-card h3{font-size:18px}.calculation-card>p{font-size:12px}.about-inner{gap:50px}}
+      @media(max-width:760px){.site-container{width:calc(100% - 44px)}.header-inner{min-height:73px;flex-wrap:wrap;gap:0;padding-top:17px;padding-bottom:0}.brand-mark{width:34px;height:34px}.brand-name{font-size:27px}.main-nav{order:3;flex:0 0 100%;justify-content:center;gap:35px;margin-top:11px;border-top:1px solid var(--line)}.main-nav a{font-size:10px;padding:13px 0}.header-guide{font-size:9px;padding:9px 10px}.hero-headline{font-size:23px;white-space:normal}.hero-wordmark{font-size:74px}.hero-eyebrow{font-size:9px}.hero-actions{gap:17px}.primary-button{font-size:10px;gap:17px;padding:10px 14px}.hero-secondary{font-size:9px}.hero-description{font-size:10.5px}.hero-image img{object-position:41% 50%}.section-heading h2{font-size:21px}.section-heading>p{font-size:9.5px}.calculation-card{padding:20px;min-height:274px}.calculation-card h3{font-size:16px}.calculation-card>p{font-size:10.7px}.card-circuit{height:74px}.card-english{font-size:7px}.about-inner{gap:40px}.about-heading h2{font-size:23px}.about-copy p{font-size:10.5px}.footer-inner{flex-wrap:wrap;gap:25px}.footer-inner>p{order:3;flex:0 0 100%;padding-top:21px;border-top:1px solid var(--line)}}
+      @media(max-width:560px){.site-container{width:calc(100% - 40px)}.hero,.hero-inner{min-height:640px}.hero-inner{align-items:flex-start}.hero-copy{width:100%;padding:33px 0 0}.hero-wordmark{font-size:79px}.hero-headline{font-size:28px;margin-top:0}.hero-description{font-size:11.5px;margin-top:9px;line-height:2}.hero-actions{margin-top:23px;gap:25px}.primary-button{min-height:43px;font-size:11px;padding:11px 17px;gap:23px}.hero-secondary{font-size:10px}.hero-image{top:auto;height:352px;bottom:-12px}.hero-image img{object-position:9% 52%}.hero-shading{background:linear-gradient(180deg,#0c0910 0%,#0c0910 40%,#0c091070 53%,transparent 69%,#100e15 100%)}.calculations-section{padding:30px 0 35px}.section-heading{display:block;margin-bottom:23px}.section-heading h2{font-size:22px}.section-heading>p{font-size:10.5px;margin-top:9px}.section-heading>p br{display:none}.calculations-grid{grid-template-columns:minmax(0,1fr);gap:15px}.calculation-card{min-height:269px;padding:21px 24px 18px}.card-english{font-size:8px;letter-spacing:1.4px}.card-number{font-size:26px}.card-circuit{height:76px;max-width:265px}.calculation-card h3{font-size:19px}.calculation-card>p{font-size:11.7px}.card-bottom{font-size:11px}.about-section{padding:35px 0 37px}.about-inner{grid-template-columns:1fr;gap:21px}.about-heading h2{font-size:25px}.about-copy{margin:0;max-width:100%}.about-copy p{font-size:11.5px}.footer-actions{gap:16px}.file-list{grid-template-columns:1fr}.guides summary{font-size:10px}}
+      @media(max-width:370px){.site-container{width:calc(100% - 32px)}.hero-headline{font-size:24px}.hero-actions{gap:16px}.hero-description{font-size:10.5px}.main-nav{gap:25px}.section-heading h2{font-size:20px}}
+      @media(prefers-reduced-motion:reduce){html:not([data-motion-mode="on"]){scroll-behavior:auto}html:not([data-motion-mode="on"]) *,html:not([data-motion-mode="on"]) *::before,html:not([data-motion-mode="on"]) *::after{animation:none!important;transition:none!important}}
+    </style>
+    <style id="volta-motion-styles">
+      /* Motion is progressive enhancement: content stays visible if the script cannot run. */
+      .motion-enhanced .hero-image,.motion-enhanced .hero-copy,.motion-enhanced .calculation-card{animation:none}
+      .calculation-card:focus-visible{translate:0 -5px;border-color:rgba(var(--accent-rgb),.5)}
+      .calculation-card:focus-visible .card-circuit{opacity:1;transform:translateY(-2px)}
+      .calculation-card:focus-visible .card-arrow svg{transform:translate(-2px,-2px)}
+      .motion-controls{display:flex;align-items:flex-end;gap:13px;flex-wrap:wrap;margin-top:17px}
+      .motion-controls[hidden]{display:none!important}
+      .motion-controls label{display:flex;flex-direction:column;gap:7px;color:#c2a6cf;font-size:10px}
+      .motion-controls select{font:inherit;line-height:1.7;border:1px solid #b18bc743;border-radius:5px;background:#1e1527;color:#d8c3e4;min-height:36px;padding:7px 10px;min-width:165px}
+      .motion-controls button{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:10px;line-height:1.7;border:1px solid #c19b784f;border-radius:5px;background:#211923;color:#dab997;min-height:36px;padding:8px 13px;cursor:pointer}
+      .motion-controls button:hover{border-color:#dab997a6;background:#2a1d2f}
+      .motion-controls button:disabled,.motion-controls select:disabled{opacity:.45;cursor:not-allowed}
+      .motion-controls button:focus-visible,.motion-controls select:focus-visible{outline:2px solid var(--copper);outline-offset:4px}
+      #motion-status{flex:0 0 100%;color:#af98bd;font-size:10px;line-height:2;margin:0}
+      html[data-motion-state="off"]{scroll-behavior:auto}
+      html[data-motion-state="off"] *,html[data-motion-state="off"] *::before,html[data-motion-state="off"] *::after{animation:none!important;transition:none!important}
+      html[data-motion-state="off"] .calculation-card:hover,html[data-motion-state="off"] .calculation-card:focus-visible{translate:none}
+      html[data-motion-state="off"] .calculation-card .card-circuit,html[data-motion-state="off"] .calculation-card .card-arrow svg{transform:none}
+    </style>
+    <style id="abas-offline-brand">
+      .brand{direction:ltr}.brand-name{font-size:19px;letter-spacing:1px;font-weight:750;white-space:nowrap}.brand-caption{font-size:7px;letter-spacing:1.5px}.brand-compact .brand-name{font-size:16px}.brand-compact .brand-caption{font-size:6px;letter-spacing:1.2px}.hero-wordmark{direction:ltr;font-size:clamp(42px,4.8vw,70px);letter-spacing:-2px;font-weight:800;white-space:nowrap;width:fit-content}.hero-headline{white-space:normal}.header-controls{display:flex;align-items:center;gap:16px}.language-switch{display:flex;align-items:center;gap:4px;direction:ltr}.language-switch button{font:inherit;font-size:11px;border:0;border-radius:4px;min-height:34px;padding:5px 7px;background:none;color:#a89ab4;cursor:pointer}.language-switch button[aria-pressed="true"]{color:#e1ba96;background:#bf967314}.language-switch>span{font-size:10px;color:#66546e}.language-switch button:focus-visible{outline:2px solid #d8a77f;outline-offset:3px}html[lang="en"] .hero-inner{justify-content:flex-end}html[lang="en"] .hero-copy{text-align:left}html[lang="en"] .hero-headline{font-size:clamp(23px,2.1vw,32px)}html[lang="en"] .hero-description{line-height:1.85}html[lang="en"] .about-copy{margin-right:0;margin-left:auto}html[lang="en"] .primary-button svg,html[lang="en"] .hero-secondary svg,html[lang="en"] .card-arrow svg{scale:-1 1}html[lang="en"] .guide-content{font-size:12px;line-height:1.9}
+      @media(max-width:760px){.brand-name{font-size:16px}.hero-wordmark{font-size:clamp(36px,5.8vw,48px)}.header-guide{display:none}.header-controls{gap:5px}}
+      @media(max-width:560px){.hero-wordmark{font-size:clamp(37px,10.7vw,56px)}html[lang="en"] .hero-inner{justify-content:flex-start}html[lang="en"] .hero-copy{width:100%}html[lang="en"] .hero-headline{font-size:25px}}
+    </style>
+  </head>
+  <body>
+    <div class="site-shell">
+      <a class="skip-link" href="#calculations">رفتن به محاسبات</a>
+      <header class="site-header">
+        <div class="site-container header-inner">
+          <a href="#home" class="brand" aria-label="صفحه اصلی ABAS SOFT"><svg class="brand-mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="1" y="1" width="42" height="42" rx="11" stroke="currentColor"/><path d="M9 22h7l4-11 5 23 4-12h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-type"><span class="brand-name">ABAS SOFT<span class="brand-dot">.</span></span><span class="brand-caption" dir="ltr">POWER DESIGN LAB</span></span></a>
+          <nav class="main-nav" aria-label="فهرست اصلی"><a href="#home">خانه</a><a href="#calculations">محاسبات تخصصی</a><a href="#about">درباره ABAS SOFT</a></nav>
+          <div class="header-controls"><div class="language-switch" role="group" aria-label="Language / زبان" data-no-i18n><button type="button" data-language="fa" lang="fa">فارسی</button><span>/</span><button type="button" data-language="en" lang="en">EN</button></div><a class="header-guide" href="#usage-guide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 5v16M3 3h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5v16h-5a4 4 0 0 0-4 2 4 4 0 0 0-4-2H3Z"/></svg>راهنمای استفاده</a></div>
+        </div>
+      </header>
+      <main>
+        <section class="hero" id="home" aria-labelledby="hero-title">
+          <div class="hero-image"><img src="./images/volta-copper-hero.jpg" alt="ترانسفورماتور قدرت با سیم‌پیچ مسی در نورپردازی بنفش و کهربایی" fetchpriority="high" /></div><div class="hero-shading" aria-hidden="true"></div>
+          <div class="site-container hero-inner"><div class="hero-copy"><p class="hero-eyebrow"><span></span>آزمایشگاه طراحی منابع تغذیه</p><h1 id="hero-title"><span class="hero-wordmark">ABAS SOFT<span>.</span></span><span class="hero-headline">قدرت، از <em>دقت</em> شروع می‌شود.</span></h1><p class="hero-description">مسیر حرفه‌ای طراحی منابع تغذیه سوئیچینگ؛<br />از اولین محاسبه تا آخرین جزئیات مدار.</p><div class="hero-actions"><a class="primary-button" href="#calculations">شروع محاسبات<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg></a><a class="hero-secondary" href="#about">آشنایی با ABAS SOFT<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M17 7 7 17M7 7v10h10"/></svg></a></div></div></div>
+        </section>
+        <section class="calculations-section" id="calculations" aria-labelledby="calculations-title">
+          <div class="site-container"><div class="section-heading"><div><div class="section-eyebrow"><span></span>از ورودی تا خروجی</div><h2 id="calculations-title">چهار بخش. یک طراحی بی‌نقص<span>.</span></h2></div><p>بخش موردنظر را انتخاب کنید؛<br />مستقیم وارد صفحه محاسبات شوید.</p></div>
+            <div class="calculations-grid">
+              <a class="calculation-card card-input" href="./calculations/input.html" data-module="input" aria-labelledby="input-title">
+                <div class="card-topline"><span class="card-english" dir="ltr">INPUT &amp; RECTIFIER</span><span class="card-number" dir="ltr">01</span></div>
+                <div class="card-circuit"><svg viewBox="0 0 250 86" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 43h26m-23 0c6-23 11-23 17 0s11 23 17 0M62 43h17l34-31 34 31-34 31-34-31m68 0h26m-60-31v-7m0 69v7M173 43h17m9 0h34M190 30v26m9-26v26m-113-26 13 3-5-12m27 0 13 5-4 9m-43 18 12 3-4 12m28-2 5-13 12 2"/><circle cx="62" cy="43" r="2.5"/><circle cx="233" cy="43" r="2.5"/></svg></div>
+                <h3 id="input-title">ورودی و یکسوساز</h3><p>محاسبات ولتاژ ورودی، پل دیود و انتخاب خازن بالک.</p><div class="card-bottom"><span>ورود به محاسبات</span><span class="card-arrow"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 17 7 7m0 10V7h10"/></svg></span></div>
+              </a>
+              <a class="calculation-card card-transformer" href="./calculations/transformer.html" data-module="transformer" aria-labelledby="transformer-title">
+                <div class="card-topline"><span class="card-english" dir="ltr">TRANSFORMER DESIGN</span><span class="card-number" dir="ltr">02</span></div>
+                <div class="card-circuit"><svg viewBox="0 0 250 86" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21h57v-8h14c15 0 15 15 0 15 15 0 15 15 0 15 15 0 15 15 0 15 15 0 15 15 0 15H76v-8H19M231 21h-57v-8h-14c-15 0-15 15 0 15-15 0-15 15 0 15-15 0-15 15 0 15-15 0-15 15 0 15h14v-8h57M119 11v64m12-64v64"/><circle cx="19" cy="21" r="2.5"/><circle cx="19" cy="65" r="2.5"/><circle cx="231" cy="21" r="2.5"/><circle cx="231" cy="65" r="2.5"/></svg></div>
+                <h3 id="transformer-title">طراحی ترانسفورماتور</h3><p>طراحی هسته، تعداد دور و سیم‌پیچ ترانس سوئیچینگ.</p><div class="card-bottom"><span>ورود به محاسبات</span><span class="card-arrow"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 17 7 7m0 10V7h10"/></svg></span></div>
+              </a>
+              <a class="calculation-card card-switching" href="./calculations/switching.html" data-module="switching" aria-labelledby="switching-title">
+                <div class="card-topline"><span class="card-english" dir="ltr">SWITCHING &amp; CONTROL</span><span class="card-number" dir="ltr">03</span></div>
+                <div class="card-circuit"><svg viewBox="0 0 250 86" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 60h19V27h24v33h15V27h24v33h16M135 43h27m0-20v40m8-40v15m0 10v15m0-20h30m-15 0V16h32m-32 27v27h32M170 28h15m-15 30h15m-6-4-7 4 7 4"/><circle cx="217" cy="16" r="2.5"/><circle cx="217" cy="70" r="2.5"/></svg></div>
+                <h3 id="switching-title">سوئیچینگ و کنترل</h3><p>انتخاب کلید قدرت، فرکانس سوئیچینگ و مدار کنترل.</p><div class="card-bottom"><span>ورود به محاسبات</span><span class="card-arrow"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 17 7 7m0 10V7h10"/></svg></span></div>
+              </a>
+              <a class="calculation-card card-output" href="./calculations/output.html" data-module="output" aria-labelledby="output-title">
+                <div class="card-topline"><span class="card-english" dir="ltr">OUTPUT &amp; FILTER</span><span class="card-number" dir="ltr">04</span></div>
+                <div class="card-circuit"><svg viewBox="0 0 250 86" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 31h31c0-18 18-18 18 0 0-18 18-18 18 0 0-18 18-18 18 0 0-18 18-18 18 0h106M151 31v18m-11 0h22m-22 8h22m-11 0v16m-8 0h16m-13 5h10m-7 5h4M183 60c5-6 10-6 15 0s10 6 15 0 10-6 15 0"/><circle cx="15" cy="31" r="2.5"/><circle cx="224" cy="31" r="2.5"/></svg></div>
+                <h3 id="output-title">فیلتر و خروجی</h3><p>محاسبات سلف، خازن و ریپل؛ برای یک خروجی پایدار.</p><div class="card-bottom"><span>ورود به محاسبات</span><span class="card-arrow"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 17 7 7m0 10V7h10"/></svg></span></div>
+              </a>
+            </div>
+          </div>
+        </section>
+        <section class="about-section" id="about" aria-labelledby="about-title"><div class="site-container about-inner"><div class="about-heading"><span class="section-eyebrow" dir="ltr">BUILT FOR PRECISE MINDS</span><h2 id="about-title">تمرکز روی طراحی.<br /><span>بقیه‌اش ساده است.</span></h2></div><div class="about-copy"><p>ABAS SOFT، نقطه شروع طراحی منبع تغذیه شماست. چهار مسیر مستقل برای دسترسی به محاسبات تخصصی، تا بین شما و ایده بعدی‌تان، چیزی جز یک کلیک نباشد.</p><a href="#calculations">مسیر طراحی‌تان را انتخاب کنید<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M17 17 7 7m0 10V7h10"/></svg></a></div></div></section>
+        <section class="guides" aria-label="راهنمای استفاده و اتصال فایل‌ها"><div class="site-container">
+          <details id="usage-guide"><summary>راهنمای استفاده از محاسبات</summary><div class="guide-content"><p>روی یک کارت کلیک کنید، چهار ورودی اصلی را بدهید و «محاسبه گام‌به‌گام» را بزنید. تا پیش از زدن این دکمه، هیچ محاسبه‌ای اجرا نمی‌شود؛ حتی پس از تغییر ورودی یا بارگذاری پروژه.</p><p>بعد از شروع، هر ردیف با فاصله حدود ۰٫۸ ثانیه نمایش داده می‌شود و صفحه، ردیف فعال را به سمت پایین دنبال می‌کند. نوار پایین صفحه، توقف/ادامه، نمایش همه و خاموش‌کردن دنبال‌کردن خودکار را در اختیار شما می‌گذارد.</p><p>برای دیدن فرمول و جایگذاری اعداد، روی نتیجه ردیف بزنید؛ نمایش موقتاً متوقف می‌شود تا بتوانید آن را بررسی کنید. پس از ویرایش ورودی‌ها، باید محاسبه را دوباره شروع کنید. در حالت کاهش حرکت دستگاه، اسکرول خودکار به‌صورت پیش‌فرض خاموش است.</p><p>تب‌های بالای برگه، ورودی‌های پروژه را بدون اجرای محاسبات منتقل می‌کنند. JavaScript فعال باشد؛ اینترنت و سرور لازم نیست. مدل فعلی Flyback DCM و مخصوص پیش‌طراحی است.</p></div></details>
+          <details id="setup-guide"><summary>راهنمای پروژه‌ها، گزارش و اجرای آفلاین</summary><div class="guide-content"><p>کل ZIP را Extract و <code>index.html</code> را باز کنید. پوشه <code>calculations</code> باید کنار صفحه اصلی بماند.</p><p>بالای هر صفحه، «ذخیره پروژه» فایل <code>.abas.json</code> می‌سازد و «بارگذاری پروژه» آن را باز می‌کند. پروژه‌های نسخه قبلی هم قابل بارگذاری‌اند.</p><p>Excel فقط مخصوص همان بخش است و شش برگه دارد: Inputs، Calculations، Dependencies، Checks، References و Standards. ورودی‌های استفاده‌شده در Inputs و روابط کمکی در Dependencies می‌مانند. نتیجه‌ها با تغییر Inputs دوباره محاسبه می‌شوند. Excel ورودی پروژه نیست.</p><p>«خروجی متن» و «چاپ نتایج» هم فقط اطلاعات همین بخش را گزارش می‌کنند. برای انتشار، همه محتویات بسته را روی هاست آپلود کنید؛ نصب Node.js لازم نیست.</p><p>این ابزار، عایق‌بندی، EMI، حرارت واقعی یا پایداری حلقه را تأیید نمی‌کند. برق شهر و خازن‌های پرانرژی خطرناک‌اند.</p></div></details>
+          <details id="motion-guide">
+            <summary>انیمیشن‌ها و تنظیمات حرکت</summary>
+            <div class="guide-content">
+              <p>تصویر و عنوان هنگام ورود، کارت‌ها هنگام رسیدن به دید و خطوط مدار با ورود، اشاره ماوس یا فوکوس صفحه‌کلید حرکت می‌کنند. تمام این حرکت‌ها داخل فایل هستند و اینترنت لازم ندارند.</p>
+              <p>حالت پیش‌فرض از تنظیم «کاهش حرکت» دستگاه پیروی می‌کند. اگر خودتان مایل به نمایش حرکت هستید، «روشن» را انتخاب کنید. گزینه «خاموش» همه حرکت‌ها را متوقف می‌کند.</p>
+              <div id="motion-controls" class="motion-controls" hidden>
+                <label for="motion-preference">نمایش انیمیشن<select id="motion-preference" aria-describedby="motion-status"><option value="auto">طبق تنظیمات دستگاه</option><option value="on">روشن</option><option value="off">خاموش</option></select></label>
+                <button id="motion-replay" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 9M3 4v6h6"/></svg>پخش دوباره از ابتدا</button>
+                <p id="motion-status" role="status" aria-live="polite"></p>
+              </div>
+              <noscript><p>JavaScript در این مرورگر غیرفعال است؛ صفحه و لینک‌ها کار می‌کنند، اما حرکت‌های اسکرول و بازپخش به فعال‌بودن JavaScript نیاز دارند.</p></noscript>
+            </div>
+          </details>
+        </div></section>
+      </main>
+      <footer class="site-footer"><div class="site-container footer-inner"><a href="#home" class="brand brand-compact" aria-label="بازگشت به ابتدای سایت"><svg class="brand-mark" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect x="1" y="1" width="42" height="42" rx="11" stroke="currentColor"/><path d="M9 22h7l4-11 5 23 4-12h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-type"><span class="brand-name">ABAS SOFT<span class="brand-dot">.</span></span><span class="brand-caption" dir="ltr">POWER DESIGN LAB</span></span></a><p>برای مهندسانی که به جزئیات اهمیت می‌دهند.<span dir="ltr">ABAS SOFT / ENGINEERED FOR PRECISION</span></p><div class="footer-actions"><a href="#setup-guide">راهنمای پروژه و گزارش</a><a class="back-to-top" href="#home" aria-label="بازگشت به بالا"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5m-7 7 7-7 7 7"/></svg></a></div></div></footer>
+    </div>
+    <script id="abas-offline-language">
+      if (window.AbasI18n) {
+        window.AbasI18n.attach(document.body);
+        function updateOfflineTitle() { document.title = 'ABAS SOFT | ' + (window.AbasI18n.getLanguage() === 'en' ? 'Power Supply Design Lab' : 'آزمایشگاه طراحی منابع تغذیه'); }
+        updateOfflineTitle();
+        window.addEventListener('abas-language-change', updateOfflineTitle);
+      }
+    </script>
+    <script id="volta-offline-motion">
+      (function () {
+        'use strict';
+
+        var root = document.documentElement;
+        var controls = document.getElementById('motion-controls');
+        var preference = document.getElementById('motion-preference');
+        var replay = document.getElementById('motion-replay');
+        var status = document.getElementById('motion-status');
+        var cards = Array.prototype.slice.call(document.querySelectorAll('.calculation-card'));
+        var targets = Array.prototype.slice.call(document.querySelectorAll('.hero-image,.hero-copy,.section-heading,.calculation-card,.about-inner'));
+        var media = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+        var animations = [];
+        var revealed = [];
+        var observer = null;
+        var frame = 0;
+        var enabled = false;
+
+        if (!controls || !preference || !replay || !status) return;
+        controls.hidden = false;
+        preference.value = 'auto';
+
+        if (typeof root.animate !== 'function') {
+          preference.disabled = true;
+          replay.disabled = true;
+          status.textContent = 'این مرورگر فقط حرکت‌های ساده CSS را نمایش می‌دهد. برای حرکت‌های کامل، فایل را در نسخه جدید Chrome، Edge یا Firefox باز کنید.';
+          return;
+        }
+
+        function cancelAnimations() {
+          animations.slice().forEach(function (entry) { entry.animation.cancel(); });
+          animations = [];
+        }
+
+        function play(node, keyframes, options) {
+          if (!enabled || document.hidden || !node || typeof node.animate !== 'function') return;
+          animations.slice().forEach(function (entry) {
+            if (entry.node === node) entry.animation.cancel();
+          });
+          try {
+            var animation = node.animate(keyframes, options);
+            var record = { node: node, animation: animation };
+            animations.push(record);
+            function release() {
+              var index = animations.indexOf(record);
+              if (index !== -1) animations.splice(index, 1);
+            }
+            animation.onfinish = release;
+            animation.oncancel = release;
+          } catch (error) {
+            // No animation failure may hide content or interrupt a calculation link.
+          }
+        }
+
+        function drawCircuit(card, delay) {
+          Array.prototype.forEach.call(card.querySelectorAll('.card-circuit path'), function (path, index) {
+            path.setAttribute('pathLength', '1');
+            play(path, [
+              { strokeDasharray: '1 1', strokeDashoffset: '1', opacity: .35 },
+              { strokeDasharray: '1 1', strokeDashoffset: '0', opacity: 1 }
+            ], { duration: 850, delay: delay + index * 45, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });
+          });
+        }
+
+        function reveal(node) {
+          if (!enabled || document.hidden || revealed.indexOf(node) !== -1) return;
+          revealed.push(node);
+          var isPhoto = node.classList.contains('hero-image');
+          var isCopy = node.classList.contains('hero-copy');
+          var cardIndex = cards.indexOf(node);
+          var delay = cardIndex !== -1 && window.innerWidth > 560 ? cardIndex * 75 : isCopy ? 150 : 0;
+          play(node, isPhoto ? [
+            { opacity: .1, transform: 'scale(1.035)' },
+            { opacity: 1, transform: 'scale(1)' }
+          ] : [
+            { opacity: 0, transform: 'translateY(20px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: isPhoto ? 1500 : isCopy ? 850 : 650, delay: delay, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });
+          if (cardIndex !== -1) drawCircuit(node, delay + 110);
+        }
+
+        function checkVisible() {
+          frame = 0;
+          if (!enabled || document.hidden) return;
+          var height = window.innerHeight || root.clientHeight;
+          targets.forEach(function (node) {
+            if (revealed.indexOf(node) !== -1) return;
+            var box = node.getBoundingClientRect();
+            if (box.bottom > 0 && box.top < height - 16) reveal(node);
+          });
+        }
+
+        function scheduleVisibilityCheck() {
+          if (!observer && !frame && enabled) frame = window.requestAnimationFrame(checkVisible);
+        }
+
+        function watchVisibleElements() {
+          if (observer) observer.disconnect();
+          observer = null;
+          if (frame) window.cancelAnimationFrame(frame);
+          frame = 0;
+          if (!enabled || document.hidden) return;
+          if ('IntersectionObserver' in window) {
+            observer = new IntersectionObserver(function (entries) {
+              entries.forEach(function (entry) {
+                if (!entry.isIntersecting || entry.intersectionRatio < .08 || document.hidden) return;
+                reveal(entry.target);
+                if (observer) observer.unobserve(entry.target);
+              });
+            }, { threshold: .08 });
+            targets.forEach(function (node) {
+              if (revealed.indexOf(node) === -1) observer.observe(node);
+            });
+          } else {
+            scheduleVisibilityCheck();
+          }
+        }
+
+        function applyPreference() {
+          enabled = preference.value === 'on' || (preference.value === 'auto' && !(media && media.matches));
+          root.setAttribute('data-motion-mode', preference.value);
+          root.setAttribute('data-motion-state', enabled ? 'on' : 'off');
+          cancelAnimations();
+          revealed = [];
+          replay.disabled = !enabled;
+          status.textContent = enabled
+            ? 'انیمیشن‌ها فعال‌اند. کارت‌ها با رسیدن به دید اجرا می‌شوند؛ برای دیدن دوباره، دکمه بازپخش را بزنید.'
+            : preference.value === 'auto'
+              ? 'تنظیم کاهش حرکت دستگاه فعال است. انیمیشن‌ها متوقف‌اند؛ در صورت تمایل خودتان «روشن» را انتخاب کنید.'
+              : 'انیمیشن‌ها خاموش‌اند. صفحه و لینک‌های محاسبات همچنان کار می‌کنند.';
+          watchVisibleElements();
+        }
+
+        function replayFromTop() {
+          if (!enabled) return;
+          cancelAnimations();
+          if (observer) observer.disconnect();
+          revealed = [];
+          var oldBehavior = root.style.scrollBehavior;
+          root.style.scrollBehavior = 'auto';
+          window.scrollTo(0, 0);
+          var title = document.getElementById('hero-title');
+          if (title) {
+            title.setAttribute('tabindex', '-1');
+            try { title.focus({ preventScroll: true }); } catch (error) { title.focus(); }
+          }
+          root.style.scrollBehavior = oldBehavior;
+          status.textContent = 'پخش دوباره از ابتدای صفحه شروع شد. برای نمایش کارت‌ها به پایین اسکرول کنید.';
+          window.requestAnimationFrame(watchVisibleElements);
+        }
+
+        try {
+          root.classList.add('motion-enhanced');
+          cards.forEach(function (card) {
+            card.addEventListener('mouseenter', function () { drawCircuit(card, 0); });
+            card.addEventListener('focus', function () { reveal(card); drawCircuit(card, 0); });
+          });
+          preference.addEventListener('change', applyPreference);
+          replay.addEventListener('click', replayFromTop);
+          if (media) {
+            var onSystemChange = function () { if (preference.value === 'auto') applyPreference(); };
+            if (media.addEventListener) media.addEventListener('change', onSystemChange);
+            else if (media.addListener) media.addListener(onSystemChange);
+          }
+          window.addEventListener('scroll', scheduleVisibilityCheck, { passive: true });
+          window.addEventListener('resize', scheduleVisibilityCheck);
+          document.addEventListener('visibilitychange', function () {
+            if (document.hidden) cancelAnimations();
+            else watchVisibleElements();
+          });
+          window.addEventListener('pageshow', function (event) { if (event.persisted) applyPreference(); });
+          applyPreference();
+        } catch (error) {
+          enabled = false;
+          cancelAnimations();
+          if (observer) observer.disconnect();
+          root.classList.remove('motion-enhanced');
+          replay.disabled = true;
+          preference.disabled = true;
+          status.textContent = 'حرکت‌های پیشرفته در این مرورگر اجرا نشدند؛ محتوای صفحه و لینک‌ها در دسترس هستند.';
+        }
+      })();
+    </script>
+  </body>
+</html>

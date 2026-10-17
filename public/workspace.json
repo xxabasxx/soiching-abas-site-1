@@ -1,0 +1,40 @@
+{
+  "modules": [
+    {
+      "id": "input",
+      "title": "ورودی و یکسوساز",
+      "titleEn": "Input & rectifier",
+      "english": "INPUT & RECTIFIER",
+      "description": "محاسبات ولتاژ ورودی، پل دیود و انتخاب خازن بالک.",
+      "descriptionEn": "Input voltage, bridge rectifier and bulk capacitor sizing.",
+      "path": "./calculations/input.html"
+    },
+    {
+      "id": "transformer",
+      "title": "طراحی ترانسفورماتور",
+      "titleEn": "Transformer design",
+      "english": "TRANSFORMER DESIGN",
+      "description": "طراحی هسته، تعداد دور و سیم‌پیچ ترانس سوئیچینگ.",
+      "descriptionEn": "Core, turns and winding design for your flyback transformer.",
+      "path": "./calculations/transformer.html"
+    },
+    {
+      "id": "switching",
+      "title": "سوئیچینگ و کنترل",
+      "titleEn": "Switching & control",
+      "english": "SWITCHING & CONTROL",
+      "description": "انتخاب کلید قدرت، فرکانس سوئیچینگ و مدار کنترل.",
+      "descriptionEn": "Power switch, switching frequency and control calculations.",
+      "path": "./calculations/switching.html"
+    },
+    {
+      "id": "output",
+      "title": "فیلتر و خروجی",
+      "titleEn": "Output & filter",
+      "english": "OUTPUT & FILTER",
+      "description": "محاسبات سلف، خازن و ریپل؛ برای یک خروجی پایدار.",
+      "descriptionEn": "Capacitance, ripple and post-filter design for a stable output.",
+      "path": "./calculations/output.html"
+    }
+  ]
+}
