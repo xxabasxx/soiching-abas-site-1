@@ -30,7 +30,7 @@
     transformer: { title: 'طراحی ترانسفورماتور', english: 'TRANSFORMER DESIGN', subtitle: 'از مشخصات اولیه تا هسته، سیم‌پیچ، گپ و پیشنهاد قطعه.', accent: '#d8a77f', summary: ['lp', 'np', 'ns'] },
     switching: { title: 'سوئیچینگ و کنترل', english: 'SWITCHING & CONTROL', subtitle: 'کلید قدرت، محدودکننده جریان، اسنابر و پیشنهاد ماسفت.', accent: '#d8a77f', summary: ['vdsRating', 'senseR', 'mosLoss'] },
     output: { title: 'فیلتر و خروجی', english: 'OUTPUT & FILTER', subtitle: 'خازن، دیود یکسوساز و پیشنهاد دیود خروجی.', accent: '#d8a77f', summary: ['coutStd', 'rippleActual', 'diodeVr'] },
-    ironcore: { title: 'محاسبات هسته آهن', english: 'IRON CORE DESIGN', subtitle: 'ترانس فرکانس شبکه؛ هسته EI، سیم‌پیچ، تلفات و پیشنهاد سایز.', accent: '#dca678', summary: ['tpv', 'npIron', 'nsIron'], basics: ['vPrim', 'vSec', 'iSec', 'fNet'], supplyType: 'ac-ac', topology: 'iron-ei', standaloneModule: true, badge: 'IRON CORE / 50-60Hz', badgeNote: 'طراحی ترانس EI فرکانس شبکه؛ ورودی اولیه، ثانویه، جریان و فرکانس.', configNote: 'این ماژول مستقل از فلای‌بک است. ورودی‌های اختصاصی خودش را وارد کنید.', tip: 'ولتاژ اولیه، ولتاژ ثانویه، جریان ثانویه و فرکانس شبکه را وارد کنید.' },
+    ironcore: { title: 'محاسبات هسته آهن', english: 'IRON CORE DESIGN', subtitle: 'ترانس فرکانس شبکه؛ هسته EI، سیم‌پیچ، تلفات و پیشنهاد سایز.', accent: '#dca678', summary: ['tpv', 'npIron', 'nsIron'], basics: ['iType', 'vPrim', 'vSec', 'iSec', 'fNet'], supplyType: 'ac-ac', topology: 'iron-ei', standaloneModule: true, badge: 'IRON CORE / 50-60Hz', badgeNote: 'طراحی ترانس EI فرکانس شبکه؛ ورودی اولیه، ثانویه، جریان و فرکانس.', configNote: 'این ماژول مستقل از فلای‌بک است. ورودی‌های اختصاصی خودش را وارد کنید.', tip: 'ولتاژ اولیه، ولتاژ ثانویه، جریان ثانویه و فرکانس شبکه را وارد کنید.' },
     motor: { title: 'محاسبات الکتروموتور', english: 'MOTOR DESIGN', subtitle: 'محاسبات استاتور، روتور، گشتاور و پیشنهاد نوع موتور.', accent: '#8daeda', summary: ['torque', 'rpm', 'effMotor'], basics: ['mType', 'mVolt', 'mPower', 'mPoles', 'mFreq'], supplyType: 'ac-ac', topology: 'induction-motor', standaloneModule: true, badge: 'INDUCTION MOTOR', badgeNote: 'موتور القایی متناوب؛ ولتاژ، توان، قطب‌ها و فرکانس.', configNote: 'این ماژول مستقل است. ولتاژ تغذیه، توان، تعداد قطب و فرکانس را وارد کنید.', tip: 'نوع موتور، ولتاژ تغذیه، توان مکانیکی، تعداد قطب و فرکانس شبکه را وارد کنید.' }
   };
 
@@ -111,6 +111,7 @@
   field('effIron', 'بازده مبنای طراحی', 'eta_iron', '%', 95, 70, 99, 'ironcore');
   field('regComp', 'جبران دور ثانویه', 'reg_comp', '%', 4, 0, 15, 'ironcore');
   field('wkgIron', 'تلفات مخصوص هسته', 'W_kg', 'W/kg', 1.2, 0.3, 5, 'ironcore');
+  field('iType', 'نوع ترانس', 'xfmr_type', '', 0, 0, 1, 'ironcore', 'تک‌فاز (0) | سه‌فاز (1)');
   field('iAppClass', 'کلاس کاربرد', 'i_app_class', '', 0, 0, 1, 'ironcore', 'عمومی (0): ورق معمولی EI | صنعتی (1): ورق سیلیکون Hi-B با چگالی شار بالاتر');
 
   // --- الکتروموتور القایی ---
@@ -123,7 +124,7 @@
   field('mSlip', 'لغزش نامی', 's_nom', '%', 4, 0.5, 15, 'motor');
   field('mPhase', 'تعداد فاز', 'phase', '', 3, 1, 3, 'motor');
   field('mOLF', 'ضریب اضافه‌بار', 'OLF', '', 1.5, 1.1, 3, 'motor');
-  field('mType', 'نوع موتور (0=AC القایی، 1=DC جداگانه)', 'motor_type', '', 0, 0, 1, 'motor', 'AC القایی (0): سه‌فاز | DC (1): موتور جریان مستقیم با تحریک جداگانه');
+  field('mType', 'نوع موتور', 'motor_type', '', 1, 0, 2, 'motor', 'تک‌فاز (0) | سه‌فاز (1) | DC (2)');
   field('dcVa', 'ولتاژ آرمیچر DC', 'V_a', 'V', 220, 12, 800, 'motor', 'ولتاژ آرمیچر موتور DC؛ فقط برای نوع DC');
   field('dcVf', 'ولتاژ تحریک DC', 'V_f', 'V', 220, 12, 800, 'motor', 'ولتاژ سیم‌پیچ تحریک؛ برای تحریک جداگانه');
   field('dcRa', 'مقاومت آرمیچر', 'R_a', 'ohm', 0.5, 0.01, 50, 'motor', 'مقاومت سیم‌پیچ آرمیچر DC');
@@ -267,9 +268,13 @@
   row('switching', 'پیشنهاد قطعه تجاری', 'suggestedMosfet', 'ماسفت پیشنهادی بازار', '', 0);
 
   // --- ترانس هسته آهن (۵۰/۶۰Hz، مستقل از فلای‌بک) ---
-  row('ironcore', 'توان و جریان', 'vaSec', 'توان ظاهری ثانویه', 'VA', mul('vSec', 'iSec'));
+  row('ironcore', 'توان و جریان', 'vaSec1ph', 'توان ظاهری تک‌فاز', 'VA', mul('vSec', 'iSec'));
+  row('ironcore', 'توان و جریان', 'vaSec3ph', 'توان ظاهری سه‌فاز', 'VA', mul('vSec', 'iSec', sqrt(3)));
+  row('ironcore', 'توان و جریان', 'vaSec', 'توان ظاهری مؤثر', 'VA', add(mul(sub(1, 'iType'), 'vaSec1ph'), mul('iType', 'vaSec3ph')));
   row('ironcore', 'توان و جریان', 'vaIn', 'توان ورودی طراحی', 'VA', div('vaSec', pct('effIron')));
-  row('ironcore', 'توان و جریان', 'iPrim', 'جریان نامی اولیه', 'A', div('vaIn', 'vPrim'));
+  row('ironcore', 'توان و جریان', 'iPrim1ph', 'جریان اولیه تک‌فاز', 'A', div('vaIn', 'vPrim'));
+  row('ironcore', 'توان و جریان', 'iPrim3ph', 'جریان اولیه سه‌فاز', 'A', div('vaIn', mul('vPrim', sqrt(3))));
+  row('ironcore', 'توان و جریان', 'iPrim', 'جریان نامی اولیه مؤثر', 'A', add(mul(sub(1, 'iType'), 'iPrim1ph'), mul('iType', 'iPrim3ph')));
   row('ironcore', 'هسته و سطح مقطع', 'bDesign', 'چگالی شار مؤثر', 'T', add('bIron', mul('iAppClass', 0.2)));
   row('ironcore', 'هسته و سطح مقطع', 'safetyFactor', 'ضریب ایمنی کلاس', '', add(1, mul('iAppClass', 0.15)));
   row('ironcore', 'هسته و سطح مقطع', 'aGross', 'سطح مقطع ناخالص هسته', 'cm2', mul('kIron', sqrt('vaSec')));
@@ -310,9 +315,14 @@
   row('motor', 'سرعت و گشتاور', 'torque', 'گشتاور نامی', 'N.m', div(mul('pMech', 60), mul(2, Math.PI, 'rpm')));
   row('motor', 'سرعت و گشتاور', 'tStart', 'گشتاور راه‌اندازی تخمینی', 'N.m', mul('torque', 'mOLF'));
   row('motor', 'توان و جریان', 'pElec', 'توان الکتریکی ورودی', 'W', div('pMech', pct('mEff')));
-  row('motor', 'توان و جریان', 'iLine', 'جریان خط', 'A', div('pElec', mul('mVolt', sqrt(3), 'mPF')));
-  row('motor', 'توان و جریان', 'iPhase', 'جریان فاز (ستاره)', 'A', div('iLine', sqrt(3)));
-  row('motor', 'توان و جریان', 'sApparent', 'توان ظاهری', 'kVA', div(mul('mVolt', 'iLine', sqrt(3)), 1000));
+  row('motor', 'توان و جریان', 'iLine1ph', 'جریان خط تک‌فاز', 'A', div('pElec', mul('mVolt', 'mPF')));
+  row('motor', 'توان و جریان', 'iLine3ph', 'جریان خط سه‌فاز', 'A', div('pElec', mul('mVolt', sqrt(3), 'mPF')));
+  row('motor', 'توان و جریان', 'iLineDC', 'جریان ورودی DC', 'A', div('pElec', 'mVolt'));
+  row('motor', 'توان و جریان', 'iLine', 'جریان خط مؤثر', 'A', add(mul(op('MAX', 0, sub(1, 'mType')), 'iLine1ph'), mul(op('MIN', 1, 'mType'), sub(1, op('MAX', 0, sub('mType', 1))), 'iLine3ph'), mul(op('MAX', 0, sub('mType', 1)), 'iLineDC')));
+  row('motor', 'توان و جریان', 'iPhase', 'جریان فاز (ستاره/سه‌فاز)', 'A', div('iLine3ph', sqrt(3)));
+  row('motor', 'توان و جریان', 'sApp1ph', 'توان ظاهری تک‌فاز', 'kVA', div(mul('mVolt', 'iLine1ph'), 1000));
+  row('motor', 'توان و جریان', 'sApp3ph', 'توان ظاهری سه‌فاز', 'kVA', div(mul('mVolt', 'iLine3ph', sqrt(3)), 1000));
+  row('motor', 'توان و جریان', 'sApparent', 'توان ظاهری مؤثر', 'kVA', add(mul(op('MAX', 0, sub(1, 'mType')), 'sApp1ph'), mul(op('MIN', 1, 'mType'), sub(1, op('MAX', 0, sub('mType', 1))), 'sApp3ph'), mul(op('MAX', 0, sub('mType', 1)), div('pElec', 1000))));
   row('motor', 'تلفات و بازده', 'ieSafetyFactor', 'ضریب ایمنی کلاس کاربرد', '', add(1, mul('mAppClass', 0.2)));
   row('motor', 'تلفات و بازده', 'pLossTotal', 'مجموع تلفات', 'W', sub('pElec', 'pMech'));
   row('motor', 'تلفات و بازده', 'pCuMotor', 'تلفات مس تخمینی', 'W', mul('pLossTotal', 0.55));
@@ -477,6 +487,7 @@
     var suggestedEI = '';
     if (Number.isFinite(values.vaSec)) {
       var va = values.vaSec;
+      var is3ph = values.iType > 0.5;
       var eiClass = values.iAppClass > 0.5 ? ' [صنعتی - ورق سیلیکون Hi-B]' : ' [عمومی - ورق معمولی EI]';
     if (va <= 5) suggestedEI = 'پیشنهاد: EI-28 (5VA)' + eiClass;
       else if (va <= 15) suggestedEI = 'پیشنهاد: EI-35 / EI-41 (5–15VA)' + eiClass;
@@ -491,7 +502,7 @@
     // ۶. پیشنهاد فریم موتور القایی
     var suggestedMotor = '';
     var motClass = values.mAppClass > 0.5 ? ' | IE3/IE4 صنعتی - IEC 60034' : ' | IE1/IE2 عمومی';
-    var isDC = values.mType > 0.5;
+    var isDC = values.mType > 1.5;
     if (isDC && Number.isFinite(values.pMech)) {
       var kw = values.pMech / 1000;
       if (kw <= 0.5) suggestedMotor = 'پیشنهاد DC: موتور DC کوچک 12-48V / فریم 56–63 (تا 0.5kW)';

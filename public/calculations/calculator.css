@@ -601,3 +601,28 @@ svg { display: block; flex-shrink: 0; }
 /* standalone modules: fx bar پنهان */
 #calculator-root.is-standalone .formula-bar,
 #calculator-root.is-standalone .formula-detail { display: none !important; }
+
+/* select fields هم‌اندازه input fields */
+.calc-field select[data-field] {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #e8dfed;
+  background: #1a151f;
+  border: 1px solid rgba(179, 146, 226, .2);
+  border-radius: 7px;
+  appearance: auto;
+  cursor: pointer;
+}
+.calc-field select[data-field]:focus {
+  border-color: rgba(179, 146, 226, .5);
+  outline: 2px solid rgba(179, 146, 226, .25);
+  outline-offset: 2px;
+}
+@media print {
+  .calc-field select[data-field] { background: #fff; color: #28313b; border-color: #cfd6de; }
+}

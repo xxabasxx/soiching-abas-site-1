@@ -110,9 +110,10 @@
     return '<button type="button" class="tool-button' + (primary ? ' tool-primary' : '') + '" data-action="' + action + '"' + (['excel', 'text', 'print'].indexOf(action) !== -1 ? ' data-report-button disabled' : '') + '>' + icon(action) + '<span>' + text + '</span></button>';
   }
   var selectFields = {
-    iAppClass: [{value:0,label:'عمومی'},{value:1,label:'صنعتی'}],
-    mAppClass:  [{value:0,label:'عمومی'},{value:1,label:'صنعتی'}],
-    mType:      [{value:0,label:'AC القایی (سه‌فاز)'},{value:1,label:'DC جریان مستقیم'}]
+    iType:      [{value:0,label:'تک‌فاز'},{value:1,label:'سه‌فاز'}],
+    iAppClass:  [{value:0,label:'عمومی'},{value:1,label:'صنعتی'}],
+    mType:      [{value:0,label:'تک‌فاز'},{value:1,label:'سه‌فاز'},{value:2,label:'DC جریان مستقیم'}],
+    mAppClass:  [{value:0,label:'عمومی'},{value:1,label:'صنعتی'}]
   };
   function fieldMarkup(f) {
     var opts = selectFields[f.key];
