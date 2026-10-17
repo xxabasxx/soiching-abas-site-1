@@ -597,3 +597,7 @@ svg { display: block; flex-shrink: 0; }
 .standalone-module-note > p { margin: 0; }
 .standalone-module-note svg { flex: none; margin-top: 2px; opacity: .7; }
 .standalone-module-note .field-error { margin-top: 6px; }
+
+/* standalone modules: fx bar پنهان */
+#calculator-root.is-standalone .formula-bar,
+#calculator-root.is-standalone .formula-detail { display: none !important; }

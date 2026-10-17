@@ -104,7 +104,18 @@
   function tool(action, text, primary) {
     return '<button type="button" class="tool-button' + (primary ? ' tool-primary' : '') + '" data-action="' + action + '"' + (['excel', 'text', 'print'].indexOf(action) !== -1 ? ' data-report-button disabled' : '') + '>' + icon(action) + '<span>' + text + '</span></button>';
   }
+  var selectFields = {
+    iAppClass: [{value:0,label:'عمومی'},{value:1,label:'صنعتی'}],
+    mAppClass:  [{value:0,label:'عمومی'},{value:1,label:'صنعتی'}],
+    mType:      [{value:0,label:'AC القایی (سه‌فاز)'},{value:1,label:'DC جریان مستقیم'}]
+  };
   function fieldMarkup(f) {
+    var opts = selectFields[f.key];
+    if (opts) {
+      var cur = parseFloat(state[f.key]) || 0;
+      var sel = opts.map(function(o) { return '<option value="' + o.value + '"' + (Math.abs(o.value - cur) < 0.5 ? ' selected' : '') + '>' + esc(o.label) + '</option>'; }).join('');
+      return '<label class="calc-field" for="field-' + f.key + '"><span class="calc-field-label">' + esc(f.label) + (f.note ? '<span class="field-info" title="' + esc(f.note) + '">' + icon('info', 12) + '</span>' : '') + '</span><select id="field-' + f.key + '" name="' + f.key + '" data-field="' + f.key + '" aria-describedby="error-' + f.key + '">' + sel + '</select><span id="error-' + f.key + '" class="field-error"></span></label>';
+    }
     return '<label class="calc-field" for="field-' + f.key + '"><span class="calc-field-label">' + esc(f.label) + (f.note ? '<span class="field-info" title="' + esc(f.note) + '">' + icon('info', 12) + '</span>' : '') + '</span><span class="input-unit"><input id="field-' + f.key + '" name="' + f.key + '" data-field="' + f.key + '" value="' + esc(state[f.key]) + '" type="text" inputmode="decimal" dir="ltr" autocomplete="off" spellcheck="false" aria-describedby="error-' + f.key + '"><span dir="ltr">' + esc(unit(f.unit)) + '</span></span><span id="error-' + f.key + '" class="field-error"></span></label>';
   }
   function parameterGroup(label, items, note) {
@@ -118,7 +129,7 @@
   }
   function configurationMarkup() {
     if (module.standaloneModule) {
-      return '<div class="standalone-module-note"><p>' + icon('shield', 16) + '<span>' + esc(module.configNote || module.badgeNote || '') + '</span></p><p id="configuration-error" class="field-error" role="alert"></p></div>';
+      return '<p id="configuration-error" class="field-error" role="alert"></p>';
     }
     return '<fieldset class="source-configuration"><legend>نوع منبع و توپولوژی</legend><div class="configuration-fields"><label class="calc-field" for="supply-type"><span class="calc-field-label">نوع منبع</span><select id="supply-type" data-configuration="supplyType" aria-describedby="configuration-note">' + configurationOptions(E.designOptions.supplyTypes, configuration.supplyType) + '</select></label><label class="calc-field" for="design-topology"><span class="calc-field-label">توپولوژی</span><select id="design-topology" data-configuration="topology" aria-describedby="configuration-note">' + configurationOptions(E.designOptions.topologies, configuration.topology) + '</select></label></div><p id="configuration-note">مدل فعال این نسخه: AC/DC ایزوله با فلای‌بک DCM. گزینه‌های دیگر غیرفعال‌اند چون فرمول محاسباتی آن‌ها هنوز پیاده‌سازی نشده است.</p><p id="configuration-error" class="field-error" role="alert"></p></fieldset>';
   }
@@ -128,6 +139,7 @@
   var specific = plan.fields.filter(function (f) { return f.group === moduleId && (!basicKeys || basicKeys.indexOf(f.key) === -1); });
   var inherited = plan.fields.filter(function (f) { return ['basic', 'electrical', moduleId].indexOf(f.group) === -1; });
 
+  if (module.standaloneModule) root.classList.add('is-standalone');
   root.innerHTML = '<div class="calculator-app">' +
     '<a class="calc-skip-link" href="#worksheet">رفتن به برگه محاسبات</a>' +
     '<header class="calc-topbar"><div class="calc-topbar-inner">' + logo() + '<div class="calc-breadcrumb"><span>آزمایشگاه طراحی توان</span><b>/</b><strong>محاسبات تخصصی</strong></div><div class="calc-language-switch" role="group" aria-label="Language / زبان" dir="ltr" data-no-i18n><button type="button" data-language="fa" lang="fa">فارسی</button><span>/</span><button type="button" data-language="en" lang="en">EN</button></div><a class="home-link" data-home-link href="../index.html#calculations">بازگشت به همه بخش‌ها' + icon('back', 16) + '</a></div></header>' +
@@ -535,6 +547,10 @@
     var key = event.target.getAttribute('data-field');
     if (key) { state[key] = event.target.value; invalidate(); }
     else if (event.target.id === 'project-notes') { notes = event.target.value; persist(); renderPrint(); }
+  });
+  document.getElementById('parameters-form').addEventListener('change', function (event) {
+    var key = event.target.getAttribute('data-field');
+    if (key && event.target.tagName === 'SELECT' && !event.target.getAttribute('data-configuration')) { state[key] = event.target.value; invalidate(); return; }
   });
   document.getElementById('parameters-form').addEventListener('change', function (event) {
     var key = event.target.getAttribute('data-configuration');

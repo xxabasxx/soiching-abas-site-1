@@ -111,7 +111,7 @@
   field('effIron', 'بازده مبنای طراحی', 'eta_iron', '%', 95, 70, 99, 'ironcore');
   field('regComp', 'جبران دور ثانویه', 'reg_comp', '%', 4, 0, 15, 'ironcore');
   field('wkgIron', 'تلفات مخصوص هسته', 'W_kg', 'W/kg', 1.2, 0.3, 5, 'ironcore');
-  field('iAppClass', 'کلاس کاربرد (0=عمومی، 1=صنعتی)', 'i_app_class', '', 0, 0, 1, 'ironcore', '0: ورق معمولی EI | 1: ورق سیلیکون مرغوب با B بالاتر و تلفات کمتر');
+  field('iAppClass', 'کلاس کاربرد', 'i_app_class', '', 0, 0, 1, 'ironcore', 'عمومی (0): ورق معمولی EI | صنعتی (1): ورق سیلیکون Hi-B با چگالی شار بالاتر');
 
   // --- الکتروموتور القایی ---
   field('mVolt', 'ولتاژ تغذیه موتور', 'V_m', 'V RMS', 380, 110, 690, 'motor');
@@ -123,8 +123,13 @@
   field('mSlip', 'لغزش نامی', 's_nom', '%', 4, 0.5, 15, 'motor');
   field('mPhase', 'تعداد فاز', 'phase', '', 3, 1, 3, 'motor');
   field('mOLF', 'ضریب اضافه‌بار', 'OLF', '', 1.5, 1.1, 3, 'motor');
+  field('mType', 'نوع موتور (0=AC القایی، 1=DC جداگانه)', 'motor_type', '', 0, 0, 1, 'motor', 'AC القایی (0): سه‌فاز | DC (1): موتور جریان مستقیم با تحریک جداگانه');
+  field('dcVa', 'ولتاژ آرمیچر DC', 'V_a', 'V', 220, 12, 800, 'motor', 'ولتاژ آرمیچر موتور DC؛ فقط برای نوع DC');
+  field('dcVf', 'ولتاژ تحریک DC', 'V_f', 'V', 220, 12, 800, 'motor', 'ولتاژ سیم‌پیچ تحریک؛ برای تحریک جداگانه');
+  field('dcRa', 'مقاومت آرمیچر', 'R_a', 'ohm', 0.5, 0.01, 50, 'motor', 'مقاومت سیم‌پیچ آرمیچر DC');
+  field('dcKphi', 'ثابت گشتاور موتور DC', 'K_phi', 'V.s/rad', 1.2, 0.01, 50, 'motor', 'K.φ = ثابت ماشین × شار؛ از دیتاشیت یا آزمایش');
   field('mTargetRPM', 'دور هدف (اختیاری، 0=نادیده)', 'RPM_target', 'RPM', 0, 0, 6000, 'motor', 'اگر 0 باشد، از تعداد قطب محاسبه می‌شود. در غیر این صورت تعداد قطب از دور هدف تعیین می‌شود.');
-  field('mAppClass', 'کلاس کاربرد (0=عمومی، 1=صنعتی)', 'app_class', '', 0, 0, 1, 'motor', '0: عمومی IE1/IE2 | 1: صنعتی IE3/IE4 با استاندارد IEC');
+  field('mAppClass', 'کلاس کاربرد', 'app_class', '', 0, 0, 1, 'motor', 'عمومی (0): IE1/IE2 | صنعتی (1): IE3/IE4 بر اساس استاندارد IEC 60034');
 
   var defaults = {};
   fields.forEach(function (item) { defaults[item.key] = item.defaultValue; });
@@ -316,6 +321,18 @@
   row('motor', 'تلفات و بازده', 'pStray', 'تلفات پراکنده', 'W', mul('pLossTotal', 0.05));
   row('motor', 'تلفات و بازده', 'effMotor', 'بازده محاسبه‌شده', '%', mul(100, div('pMech', 'pElec')));
   row('motor', 'پیشنهاد قطعه', 'suggestedMotor', 'نوع و فریم موتور پیشنهادی', '', 0);
+  // --- محاسبات موتور DC (فقط وقتی mType=1) ---
+  row('motor', 'موتور DC - آرمیچر', 'dcIa', 'جریان آرمیچر DC نامی', 'A', div('pMech', mul('dcVa', pct('mEff'))));
+  row('motor', 'موتور DC - آرمیچر', 'dcEb', 'نیروی محرکه پشتی (EMF)', 'V', sub('dcVa', mul('dcIa', 'dcRa')));
+  row('motor', 'موتور DC - آرمیچر', 'dcOmega', 'سرعت زاویه‌ای روتور', 'rad/s', div(mul(2, Math.PI, 'rpm'), 60));
+  row('motor', 'موتور DC - آرمیچر', 'dcKphiCheck', 'تأیید ثابت K.φ از EMF', 'V.s/rad', div('dcEb', 'dcOmega'));
+  row('motor', 'موتور DC - آرمیچر', 'dcTorqueDC', 'گشتاور DC محاسبه‌شده', 'N.m', mul('dcKphi', 'dcIa'));
+  row('motor', 'موتور DC - تحریک', 'dcIfNom', 'جریان تحریک تخمینی', 'A', div('dcVf', mul('dcRa', 10)));
+  row('motor', 'موتور DC - تحریک', 'dcPf', 'توان تحریک', 'W', mul('dcVf', 'dcIfNom'));
+  row('motor', 'موتور DC - تحریک', 'dcPLoss', 'تلفات آرمیچر DC', 'W', mul(sq('dcIa'), 'dcRa'));
+  row('motor', 'موتور DC - تحریک', 'dcEff', 'بازده موتور DC', '%', mul(100, div('pMech', add('pMech', 'dcPLoss', 'dcPf'))));
+  row('motor', 'موتور DC - کنترل', 'dcSpeedBase', 'سرعت پایه از ولتاژ و K.φ', 'RPM', mul(div('dcEb', 'dcKphi'), div(60, mul(2, Math.PI))));
+  row('motor', 'موتور DC - کنترل', 'dcStartR', 'مقاومت استارت پیشنهادی', 'ohm', div(sub('dcVa', mul('dcKphi', 'dcOmega')), mul('dcIa', 2.5)));
   row('common', 'کنترل بودجه توان', 'knownLoss', 'جمع محافظه‌کارانه اقلام تلفات', 'W', add('mosLoss', 'diodeW', 'bridgeLoss', 'senseW', 'driveW', 'snubNomW', 'bleedW'));
 
   function referencesOf(expr) {
@@ -473,6 +490,17 @@
     // ۶. پیشنهاد فریم موتور القایی
     var suggestedMotor = '';
     var motClass = values.mAppClass > 0.5 ? ' | IE3/IE4 صنعتی - IEC 60034' : ' | IE1/IE2 عمومی';
+    var isDC = values.mType > 0.5;
+    if (isDC && Number.isFinite(values.pMech)) {
+      var kw = values.pMech / 1000;
+      if (kw <= 0.5) suggestedMotor = 'پیشنهاد DC: موتور DC کوچک 12-48V / فریم 56–63 (تا 0.5kW)';
+      else if (kw <= 1.5) suggestedMotor = 'پیشنهاد DC: فریم 63–80 (0.5–1.5kW) | تحریک جداگانه';
+      else if (kw <= 5) suggestedMotor = 'پیشنهاد DC: فریم 90–100 (1.5–5kW) | تحریک جداگانه';
+      else if (kw <= 15) suggestedMotor = 'پیشنهاد DC: فریم 112–132 (5–15kW) | صنعتی تحریک جداگانه';
+      else if (kw <= 37) suggestedMotor = 'پیشنهاد DC: فریم 160–180 (15–37kW) | صنعتی';
+      else suggestedMotor = 'پیشنهاد DC: فریم 200M+ (بالای 37kW) | صنعتی سنگین';
+      suggestedMotor += ' [DC جریان مستقیم]';
+    }
     if (Number.isFinite(values.pMech)) {
       var kw = values.pMech / 1000;
       if (kw <= 0.37) suggestedMotor = 'پیشنهاد: فریم 63 / 71 (0.12–0.37kW)' + motClass;
