@@ -31,7 +31,7 @@
     switching: { title: 'سوئیچینگ و کنترل', english: 'SWITCHING & CONTROL', subtitle: 'کلید قدرت، محدودکننده جریان، اسنابر و پیشنهاد ماسفت.', accent: '#d8a77f', summary: ['vdsRating', 'senseR', 'mosLoss'] },
     output: { title: 'فیلتر و خروجی', english: 'OUTPUT & FILTER', subtitle: 'خازن، دیود یکسوساز و پیشنهاد دیود خروجی.', accent: '#d8a77f', summary: ['coutStd', 'rippleActual', 'diodeVr'] },
     ironcore: { title: 'محاسبات هسته آهن', english: 'IRON CORE DESIGN', subtitle: 'ترانس فرکانس شبکه؛ هسته EI، سیم‌پیچ، تلفات و پیشنهاد سایز.', accent: '#dca678', summary: ['tpv', 'npIron', 'nsIron'], basics: ['vPrim', 'vSec', 'iSec', 'fNet'], supplyType: 'ac-ac', topology: 'iron-ei', standaloneModule: true, badge: 'IRON CORE / 50-60Hz', badgeNote: 'طراحی ترانس EI فرکانس شبکه؛ ورودی اولیه، ثانویه، جریان و فرکانس.', configNote: 'این ماژول مستقل از فلای‌بک است. ورودی‌های اختصاصی خودش را وارد کنید.', tip: 'ولتاژ اولیه، ولتاژ ثانویه، جریان ثانویه و فرکانس شبکه را وارد کنید.' },
-    motor: { title: 'محاسبات الکتروموتور', english: 'MOTOR DESIGN', subtitle: 'محاسبات استاتور، روتور، گشتاور و پیشنهاد نوع موتور.', accent: '#8daeda', summary: ['torque', 'rpm', 'effMotor'], basics: ['mVolt', 'mPower', 'mPoles', 'mFreq'], supplyType: 'ac-ac', topology: 'induction-motor', standaloneModule: true, badge: 'INDUCTION MOTOR', badgeNote: 'موتور القایی متناوب؛ ولتاژ، توان، قطب‌ها و فرکانس.', configNote: 'این ماژول مستقل است. ولتاژ تغذیه، توان، تعداد قطب و فرکانس را وارد کنید.', tip: 'ولتاژ تغذیه، توان مکانیکی، تعداد قطب و فرکانس شبکه را وارد کنید.' }
+    motor: { title: 'محاسبات الکتروموتور', english: 'MOTOR DESIGN', subtitle: 'محاسبات استاتور، روتور، گشتاور و پیشنهاد نوع موتور.', accent: '#8daeda', summary: ['torque', 'rpm', 'effMotor'], basics: ['mType', 'mVolt', 'mPower', 'mPoles', 'mFreq'], supplyType: 'ac-ac', topology: 'induction-motor', standaloneModule: true, badge: 'INDUCTION MOTOR', badgeNote: 'موتور القایی متناوب؛ ولتاژ، توان، قطب‌ها و فرکانس.', configNote: 'این ماژول مستقل است. ولتاژ تغذیه، توان، تعداد قطب و فرکانس را وارد کنید.', tip: 'نوع موتور، ولتاژ تغذیه، توان مکانیکی، تعداد قطب و فرکانس شبکه را وارد کنید.' }
   };
 
   var fields = [];
@@ -361,9 +361,10 @@
     displayRows.forEach(function (r) { include(r.key); });
     if (moduleId !== 'input' && moduleId !== 'ironcore' && moduleId !== 'motor') ['idle', 'designIdle', 'designIdleWorst', 'bLimit'].forEach(include);
     var displayKeys = displayRows.map(function (r) { return r.key; });
+    var basicList = modules[moduleId].basics || [];
     scopeCache[moduleId] = {
       id: moduleId,
-      fields: fields.filter(function (f) { return required[f.key]; }),
+      fields: fields.filter(function (f) { return required[f.key] || basicList.indexOf(f.key) !== -1; }),
       rows: rows.filter(function (r) { return required[r.key]; }),
       displayRows: displayRows,
       supportRows: rows.filter(function (r) { return required[r.key] && displayKeys.indexOf(r.key) === -1; })

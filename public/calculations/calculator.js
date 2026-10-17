@@ -11,7 +11,12 @@
   var sectionNumber = Object.keys(E.modules).indexOf(moduleId) + 1;
   var state = Object.assign({}, E.defaults), result = null;
   var configuration = { supplyType: module.supplyType || E.supplyType, topology: module.topology || E.topology };
-  var projectName = translate('پروژه منبع تغذیه ۱۲ ولت'), notes = '';
+  function defaultProjectName() {
+    if (moduleId === 'ironcore') return translate('پروژه ترانس هسته آهن');
+    if (moduleId === 'motor') return translate('پروژه الکتروموتور');
+    return translate('پروژه منبع تغذیه ۱۲ ولت');
+  }
+  var projectName = defaultProjectName(), notes = '';
   var storageKey = 'volta-smps-project-v1', storageOk = true;
   var STEP_DELAY_MS = 800;
   var stepTimer = 0, runToken = 0, running = false, paused = false, dirty = true;
@@ -113,7 +118,7 @@
     var opts = selectFields[f.key];
     if (opts) {
       var cur = parseFloat(state[f.key]) || 0;
-      var sel = opts.map(function(o) { return '<option value="' + o.value + '"' + (Math.abs(o.value - cur) < 0.5 ? ' selected' : '') + '>' + esc(o.label) + '</option>'; }).join('');
+      var sel = opts.map(function(o) { return '<option value="' + o.value + '"' + (Math.abs(o.value - cur) < 0.5 ? ' selected' : '') + '>' + esc(translate(o.label)) + '</option>'; }).join('');
       return '<label class="calc-field" for="field-' + f.key + '"><span class="calc-field-label">' + esc(f.label) + (f.note ? '<span class="field-info" title="' + esc(f.note) + '">' + icon('info', 12) + '</span>' : '') + '</span><select id="field-' + f.key + '" name="' + f.key + '" data-field="' + f.key + '" aria-describedby="error-' + f.key + '">' + sel + '</select><span id="error-' + f.key + '" class="field-error"></span></label>';
     }
     return '<label class="calc-field" for="field-' + f.key + '"><span class="calc-field-label">' + esc(f.label) + (f.note ? '<span class="field-info" title="' + esc(f.note) + '">' + icon('info', 12) + '</span>' : '') + '</span><span class="input-unit"><input id="field-' + f.key + '" name="' + f.key + '" data-field="' + f.key + '" value="' + esc(state[f.key]) + '" type="text" inputmode="decimal" dir="ltr" autocomplete="off" spellcheck="false" aria-describedby="error-' + f.key + '"><span dir="ltr">' + esc(unit(f.unit)) + '</span></span><span id="error-' + f.key + '" class="field-error"></span></label>';
@@ -147,12 +152,12 @@
     '<main class="calc-main"><section class="calculator-heading"><div><div class="calc-eyebrow"><span></span><span dir="ltr">' + module.english + '</span></div><h1>' + module.title + '<span>.</span></h1><p>چند ورودی از شما؛ محاسبات این بخش، گام‌به‌گام از ABAS SOFT.</p></div><div class="heading-signature" aria-hidden="true"><span dir="ltr">0' + sectionNumber + '<small> / 04</small></span><svg viewBox="0 0 180 55" fill="none"><path d="M0 28h25l12-15 17 30L74 5l19 44 17-30 14 19 9-10h47" stroke="currentColor" stroke-width="1.2"/></svg><small dir="ltr">PRECISION, ONE STEP AT A TIME</small></div></section>' +
     '<nav class="calc-tabs" aria-label="بخش‌های طراحی">' + Object.keys(E.modules).map(function (id, i) { return '<a href="./' + id + '.html" data-module-link="' + id + '" class="' + (id === moduleId ? 'active' : '') + '"' + (id === moduleId ? ' aria-current="page"' : '') + '><span dir="ltr">0' + (i + 1) + '</span>' + E.modules[id].title + '</a>'; }).join('') + '</nav>' +
     '<div class="calculator-layout"><aside class="parameters-panel"><div class="panel-title"><div><span class="panel-eyebrow">قدم اول</span><h2>مشخصات اولیه</h2></div><button class="calc-icon-button" data-action="reset" title="بازگشت به مثال پیش‌فرض" aria-label="شروع دوباره با مثال پیش‌فرض">' + icon('refresh', 17) + '</button></div>' +
-    '<form id="parameters-form" novalidate>' + configurationMarkup() + '<div class="basic-fields fields-grid">' + basics.map(fieldMarkup).join('') + '</div><p class="parameter-tip">با همین چهار مقدار شروع کنید. فرض‌های تکمیلی از پیش پر شده‌اند و باید با طراحی شما تطبیق داده شوند.</p><div class="input-actions"><button type="submit" class="calculate-button">' + icon('play', 16) + '<span>محاسبه گام‌به‌گام</span>' + icon('arrow', 17) + '</button><p class="manual-start-hint">شروع فقط با این دکمه؛ هر ردیف با فاصله حدود ۰٫۸ ثانیه نمایش داده می‌شود.</p></div>' +
+    '<form id="parameters-form" novalidate>' + configurationMarkup() + '<div class="basic-fields fields-grid">' + basics.map(fieldMarkup).join('') + '</div><p class="parameter-tip">' + esc(module.tip || 'با همین چهار مقدار شروع کنید. فرض‌های تکمیلی از پیش پر شده‌اند و باید با طراحی شما تطبیق داده شوند.') + '</p><div class="input-actions"><button type="submit" class="calculate-button">' + icon('play', 16) + '<span>محاسبه گام‌به‌گام</span>' + icon('arrow', 17) + '</button><p class="manual-start-hint">شروع فقط با این دکمه؛ هر ردیف با فاصله حدود ۰٫۸ ثانیه نمایش داده می‌شود.</p></div>' +
     '<details class="advanced-options" id="advanced-options"><summary>' + icon('sliders', 16) + '<span>فرض‌های پیشرفته این بخش</span>' + icon('fold', 14) + '</summary><div class="advanced-content">' + parameterGroup(groupNames.electrical, electrical) + parameterGroup(groupNames[moduleId], specific) + parameterGroup('فرض‌های مشترک مورد استفاده', inherited, 'فقط مقادیری که در روابط این بخش استفاده می‌شوند؛ نه تنظیمات کامل بخش‌های دیگر.') + '</div></details>' +
     '<details class="project-notes"><summary>یادداشت پروژه' + icon('fold', 14) + '</summary><textarea id="project-notes" rows="3" maxlength="2000" placeholder="نام هسته، شماره قطعه یا نکته طراحی...">' + esc(notes) + '</textarea></details></form><div class="input-model-note">' + icon('shield', 16) + '<div><strong dir="ltr">FLYBACK / DCM</strong><p>' + (moduleId === 'input' ? 'ورودی و یکسوساز، مستقل از محاسبات هسته و خروجی.' : 'پیش‌طراحی ایزوله، تک‌خروجی و فرکانس ثابت.') + '</p></div></div><p id="storage-note" class="storage-note">پشتیبان دائمی: از «ذخیره پروژه» استفاده کنید.</p></aside>' +
     '<section class="worksheet-panel" id="worksheet" aria-label="برگه محاسبات مرحله‌ای"><div class="worksheet-title"><div><span class="sheet-eyebrow" dir="ltr">ABAS SOFT / LIVE WORKSHEET</span><h2>برگه ' + module.title + '</h2></div><div class="live-status" id="live-status" role="status" aria-live="polite"><span></span>آماده محاسبه</div></div>' +
     '<div class="worksheet-runbar"><div><span id="run-icon">' + icon('play', 13) + '</span><span id="run-caption">منتظر شروع محاسبات</span></div><div class="worksheet-run-actions"><button type="button" class="worksheet-replay" data-action="pause" data-pause-button hidden>' + icon('pause', 13) + 'توقف</button><button type="button" class="worksheet-replay" data-action="replay" id="worksheet-replay" disabled>' + icon('refresh', 13) + 'اجرای دوباره</button></div></div><div class="run-progress" role="progressbar" aria-label="پیشرفت نمایش محاسبات" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="run-progress-fill"></span></div>' +
-    '<div class="formula-bar"><span class="cell-address" id="cell-address" dir="ltr">E5</span><span class="fx-label" aria-hidden="true">fx</span><input id="formula-expression" aria-label="فرمول ردیف انتخاب‌شده" dir="ltr" readonly value=""><button class="calc-icon-button" data-action="formula" title="نمایش جایگذاری اعداد" aria-label="نمایش جایگذاری اعداد" aria-expanded="false" id="formula-toggle">' + icon('info', 15) + '</button></div><div id="formula-detail" class="formula-detail" hidden><span id="formula-description"></span><code id="numeric-expression" dir="ltr"></code></div>' +
+    (module.standaloneModule ? '' : ('<div class="formula-bar"><span class="cell-address" id="cell-address" dir="ltr">E5</span><span class="fx-label" aria-hidden="true">fx</span><input id="formula-expression" aria-label="فرمول ردیف انتخاب‌شده" dir="ltr" readonly value=""><button class="calc-icon-button" data-action="formula" title="نمایش جایگذاری اعداد" aria-label="نمایش جایگذاری اعداد" aria-expanded="false" id="formula-toggle">' + icon('info', 15) + '</button></div><div id="formula-detail" class="formula-detail" hidden><span id="formula-description"></span><code id="numeric-expression" dir="ltr"></code></div>')) +
     '<div id="results-content"></div><div class="worksheet-bottom"><span>' + icon('info', 12) + 'روی نتیجه هر ردیف بزنید تا فرمول آن را ببینید.</span><span id="sheet-row-count"></span></div></section></div>' +
     '<section class="design-notes"><details><summary>' + icon('shield', 17) + '<span>فرض‌ها و محدوده اعتبار این طراحی</span>' + icon('fold', 14) + '</summary><ul>' + E.assumptions.map(function (text) { return '<li>' + esc(text) + '</li>'; }).join('') + '</ul></details><details><summary>' + icon('info', 17) + '<span>منابع و روش محاسبه</span>' + icon('fold', 14) + '</summary><p>گزارش این صفحه فقط شامل محاسبات همین بخش است. روابط کمکی لازم در قسمت «مبنای محاسبه‌شده مشترک» و برگه Dependencies فایل Excel قرار دارند. نمایش مرحله‌ای فقط شیوه ارائه نتیجه است؛ محاسبات واقعی بدون گردکردن میانی انجام می‌شوند.</p><ul>' + E.sources.map(function (source) { return '<li><a href="' + source.url + '" target="_blank" rel="noopener noreferrer" dir="ltr">' + esc(source.title) + '</a></li>'; }).join('') + '</ul><p id="engine-status"></p></details></section>' +
     '<footer class="calc-footer"><span>ساخته‌شده برای ذهن‌های دقیق؛ نه جایگزین تأیید مهندسی.</span><span dir="ltr">ABAS SOFT / ENGINE ' + E.version + '</span></footer></main>' +
@@ -254,12 +259,12 @@
     var row = result.displayRows[index];
     outputs.querySelectorAll('[data-step]').forEach(function (node) { node.classList.toggle('is-selected', Number(node.getAttribute('data-step')) === index); });
     outputs.querySelectorAll('[data-select-row]').forEach(function (button) { button.tabIndex = Number(button.getAttribute('data-select-row')) === index ? 0 : -1; });
-    document.getElementById('cell-address').textContent = 'E' + (index + 5);
-    formulaInput.value = '= ' + row.formula;
-    document.getElementById('formula-description').textContent = row.label;
+    var cellAddress = document.getElementById('cell-address'); if (cellAddress) cellAddress.textContent = 'E' + (index + 5);
+    if (formulaInput) formulaInput.value = '= ' + row.formula;
+    var formulaDesc = document.getElementById('formula-description'); if (formulaDesc) formulaDesc.textContent = row.label;
     var numeric = {};
     Object.keys(result.values).forEach(function (key) { numeric[key] = '(' + fullNumber(result.values[key]) + ')'; });
-    document.getElementById('numeric-expression').textContent = E.formula(row.expr, numeric, false) + ' = ' + fullNumber(row.value) + ' ' + row.unit;
+    var numericExpr = document.getElementById('numeric-expression'); if (numericExpr) numericExpr.textContent = E.formula(row.expr, numeric, false) + ' = ' + fullNumber(row.value) + ' ' + row.unit;
     if (focus) {
       var button = outputs.querySelector('[data-select-row="' + index + '"]');
       if (button) { button.focus({ preventScroll: true }); button.closest('tr').scrollIntoView({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' }); }
@@ -428,10 +433,10 @@
     setLive('منتظر شروع شما', 'is-waiting');
     runCaption.textContent = 'برای شروع، دکمه «محاسبه گام‌به‌گام» را بزنید';
     document.getElementById('run-icon').innerHTML = icon('play', 13);
-    document.getElementById('cell-address').textContent = '-';
-    formulaInput.value = '';
-    document.getElementById('formula-description').textContent = '';
-    document.getElementById('numeric-expression').textContent = '';
+    var ca = document.getElementById('cell-address'); if (ca) ca.textContent = '-';
+    if (formulaInput) formulaInput.value = '';
+    var fd = document.getElementById('formula-description'); if (fd) fd.textContent = '';
+    var ne = document.getElementById('numeric-expression'); if (ne) ne.textContent = '';
     document.getElementById('sheet-row-count').textContent = 'هنوز محاسبه‌ای انجام نشده';
     document.getElementById('print-appendix').innerHTML = '';
     document.getElementById('project-state').textContent = 'ورودی‌ها آماده؛ محاسبه شروع نشده';
@@ -458,10 +463,10 @@
     if (!engineTest) engineTest = E.selfTest();
     document.getElementById('engine-status').textContent = 'کنترل‌های داخلی: ' + (engineTest.ok ? number(engineTest.count, 0) + ' شرط عددی و حالت مرزی' : 'ناموفق') + '. این بررسی‌ها جای آزمون مستقل سخت‌افزار را نمی‌گیرند.';
     result = E.calculate(state, moduleId); dirty = false;
-    formulaInput.value = '';
-    document.getElementById('formula-description').textContent = '';
-    document.getElementById('numeric-expression').textContent = '';
-    document.getElementById('cell-address').textContent = '-';
+    if (formulaInput) formulaInput.value = '';
+    var fd2 = document.getElementById('formula-description'); if (fd2) fd2.textContent = '';
+    var ne2 = document.getElementById('numeric-expression'); if (ne2) ne2.textContent = '';
+    var ca2 = document.getElementById('cell-address'); if (ca2) ca2.textContent = '-';
     document.querySelectorAll('[data-field]').forEach(function (input) {
       var key = input.getAttribute('data-field'), error = result.errors[key] || '';
       input.setAttribute('aria-invalid', error ? 'true' : 'false');
@@ -472,7 +477,7 @@
     outputs.classList.remove('is-stale');
     if (!result.valid || !engineTest.ok) {
       completed = 0; setProgress(0);
-      formulaInput.value = ''; document.getElementById('numeric-expression').textContent = ''; document.getElementById('formula-description').textContent = '';
+      if (formulaInput) formulaInput.value = ''; var ne3 = document.getElementById('numeric-expression'); if (ne3) ne3.textContent = ''; var fd3 = document.getElementById('formula-description'); if (fd3) fd3.textContent = '';
       setLive(engineTest.ok ? 'ورودی نیاز به اصلاح دارد' : 'کنترل داخلی ناموفق بود', 'has-errors');
       runCaption.textContent = 'ابتدا ورودی‌های مشخص‌شده را اصلاح کنید';
       document.getElementById('project-state').textContent = 'تغییرات نامعتبر ذخیره نشد';
@@ -600,7 +605,7 @@
     if (action === 'replay') { if (running) finishSequence(); else if (result && !dirty) calculate(); return; }
     if (action === 'reset') {
       if (window.confirm(translate('پروژه فعلی با مثال اولیه جایگزین شود؟ برای نگهداری پروژه از «ذخیره پروژه» استفاده کنید.'))) {
-        state = Object.assign({}, E.defaults); configuration = { supplyType: E.supplyType, topology: E.topology }; projectName = translate('پروژه منبع تغذیه ۱۲ ولت'); notes = ''; updateForm();
+        state = Object.assign({}, E.defaults); configuration = { supplyType: module.supplyType || E.supplyType, topology: module.topology || E.topology }; projectName = defaultProjectName(); notes = ''; updateForm();
       }
       return;
     }
