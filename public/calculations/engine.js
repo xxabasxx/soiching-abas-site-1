@@ -31,7 +31,11 @@
     switching: { title: 'سوئیچینگ و کنترل', english: 'SWITCHING & CONTROL', subtitle: 'کلید قدرت، محدودکننده جریان، اسنابر و پیشنهاد ماسفت.', accent: '#d8a77f', summary: ['vdsRating', 'senseR', 'mosLoss'] },
     output: { title: 'فیلتر و خروجی', english: 'OUTPUT & FILTER', subtitle: 'خازن، دیود یکسوساز و پیشنهاد دیود خروجی.', accent: '#d8a77f', summary: ['coutStd', 'rippleActual', 'diodeVr'] },
     ironcore: { title: 'محاسبات هسته آهن', english: 'IRON CORE DESIGN', subtitle: 'ترانس فرکانس شبکه؛ هسته EI، سیم‌پیچ، تلفات و پیشنهاد سایز.', accent: '#dca678', summary: ['tpv', 'npIron', 'nsIron'], basics: ['iType', 'vPrim', 'vSec', 'iSec', 'fNet'], supplyType: 'ac-ac', topology: 'iron-ei', standaloneModule: true, badge: 'IRON CORE / 50-60Hz', badgeNote: 'طراحی ترانس EI فرکانس شبکه؛ ورودی اولیه، ثانویه، جریان و فرکانس.', configNote: 'این ماژول مستقل از فلای‌بک است. ورودی‌های اختصاصی خودش را وارد کنید.', tip: 'ولتاژ اولیه، ولتاژ ثانویه، جریان ثانویه و فرکانس شبکه را وارد کنید.' },
-    motor: { title: 'محاسبات الکتروموتور', english: 'MOTOR DESIGN', subtitle: 'محاسبات استاتور، روتور، گشتاور و پیشنهاد نوع موتور.', accent: '#8daeda', summary: ['torque', 'rpm', 'effMotor'], basics: ['mType', 'mVolt', 'mPower', 'mPoles', 'mFreq'], supplyType: 'ac-ac', topology: 'induction-motor', standaloneModule: true, badge: 'INDUCTION MOTOR', badgeNote: 'موتور القایی متناوب؛ ولتاژ، توان، قطب‌ها و فرکانس.', configNote: 'این ماژول مستقل است. ولتاژ تغذیه، توان، تعداد قطب و فرکانس را وارد کنید.', tip: 'نوع موتور، ولتاژ تغذیه، توان مکانیکی، تعداد قطب و فرکانس شبکه را وارد کنید.' }
+    motor: { title: 'محاسبات الکتروموتور', english: 'MOTOR DESIGN', subtitle: 'محاسبات استاتور، روتور، گشتاور و پیشنهاد نوع موتور.', accent: '#8daeda', summary: ['torque', 'rpm', 'effMotor'], basics: ['mType', 'mVolt', 'mPower', 'mPoles', 'mFreq'], supplyType: 'ac-ac', topology: 'induction-motor', standaloneModule: true, badge: 'INDUCTION MOTOR', badgeNote: 'موتور القایی متناوب؛ ولتاژ، توان، قطب‌ها و فرکانس.', configNote: 'این ماژول مستقل است. ولتاژ تغذیه، توان، تعداد قطب و فرکانس را وارد کنید.', tip: 'نوع موتور، ولتاژ تغذیه، توان مکانیکی، تعداد قطب و فرکانس شبکه را وارد کنید.' },
+    'ironcore-ind': { title: 'ترانس هسته آهن — صنعتی', english: 'IRON CORE / INDUSTRIAL', subtitle: 'ترانس صنعتی Hi-B با ضریب ایمنی بالا.', accent: '#dca678', summary: ['tpv', 'npIron', 'nsIron'], basics: ['iType', 'vPrim', 'vSec', 'iSec', 'fNet'], supplyType: 'ac-ac', topology: 'iron-ei-ind', standaloneModule: true, badge: 'IRON CORE / INDUSTRIAL', badgeNote: 'ترانس صنعتی هسته آهن EI با ورق سیلیکون Hi-B.', configNote: 'مدل صنعتی: ورق Hi-B، ضریب ایمنی ۱٫۱۵، چگالی شار ۱٫۳T.', tip: 'نوع، ولتاژ اولیه، ثانویه، جریان و فرکانس را وارد کنید.', appClassFixed: 1 },
+    'motor-ind': { title: 'الکتروموتور — صنعتی', english: 'MOTOR / INDUSTRIAL', subtitle: 'موتور القایی IE3/IE4 با استاندارد IEC 60034.', accent: '#8daeda', summary: ['torque', 'rpm', 'effMotor'], basics: ['mType', 'mVolt', 'mPower', 'mPoles', 'mFreq'], supplyType: 'ac-ac', topology: 'induction-motor-ind', standaloneModule: true, badge: 'MOTOR / INDUSTRIAL', badgeNote: 'موتور القایی صنعتی IE3/IE4 — IEC 60034.', configNote: 'مدل صنعتی: راندمان بالا، ضریب ایمنی ۱٫۲، استاندارد IE3/IE4.', tip: 'نوع موتور، ولتاژ، توان، قطب و فرکانس را وارد کنید.', appClassFixed: 1 },
+    bldc: { title: 'موتور براشلس — عمومی', english: 'BLDC / GENERAL', subtitle: 'براشلس BLDC/PMSM برای پهپاد، ابزار و کاربرد عمومی.', accent: '#a8d4b8', summary: ['kv', 'torqueBLDC', 'effBLDC'], basics: ['bldcVbus', 'bldcPower', 'bldcRPM', 'bldcPoles'], supplyType: 'dc', topology: 'bldc-general', standaloneModule: true, badge: 'BLDC / GENERAL', badgeNote: 'موتور براشلس عمومی؛ ولتاژ باس، توان، دور و قطب.', configNote: 'مدل عمومی: BLDC/PMSM کلاس Hobby تا General Purpose.', tip: 'ولتاژ باس DC، توان هدف، دور هدف و تعداد قطب را وارد کنید.', appClassFixed: 0 },
+    'bldc-ind': { title: 'موتور براشلس — صنعتی', english: 'BLDC / INDUSTRIAL', subtitle: 'براشلس صنعتی سروو/CNC با محاسبات دقیق Kv، Kt و ESC.', accent: '#a8d4b8', summary: ['kv', 'torqueBLDC', 'effBLDC'], basics: ['bldcVbus', 'bldcPower', 'bldcRPM', 'bldcPoles'], supplyType: 'dc', topology: 'bldc-industrial', standaloneModule: true, badge: 'BLDC / INDUSTRIAL', badgeNote: 'موتور براشلس صنعتی سروو/CNC؛ راندمان بالا و ضریب ایمنی IEC.', configNote: 'مدل صنعتی: PMSM/Servo با استانداردهای IEC، راندمان ≥90%.', tip: 'ولتاژ باس DC، توان، دور و قطب را وارد کنید. ضریب ایمنی صنعتی لحاظ می‌شود.', appClassFixed: 1 }
   };
 
   var fields = [];
@@ -124,6 +128,19 @@
   field('mSlip', 'لغزش نامی', 's_nom', '%', 4, 0.5, 15, 'motor');
   field('mPhase', 'تعداد فاز', 'phase', '', 3, 1, 3, 'motor');
   field('mOLF', 'ضریب اضافه‌بار', 'OLF', '', 1.5, 1.1, 3, 'motor');
+
+  // --- موتور براشلس (BLDC/PMSM) ---
+  field('bldcVbus', 'ولتاژ باس DC', 'V_bus', 'V', 24, 3, 800, 'bldc', 'ولتاژ تغذیه باتری یا منبع DC');
+  field('bldcPower', 'توان مکانیکی هدف', 'P_mech', 'W', 500, 1, 100000, 'bldc', 'توان خروجی مکانیکی موتور');
+  field('bldcRPM', 'دور هدف (بی‌باری)', 'RPM_nl', 'RPM', 3000, 100, 200000, 'bldc', 'دور بی‌باری هدف موتور');
+  field('bldcPoles', 'تعداد قطب آهنربا', 'P_mag', '', 14, 2, 48, 'bldc', 'تعداد قطب آهنربای دائم (زوج)');
+  field('bldcEff', 'بازده هدف', 'eta_bldc', '%', 82, 50, 99, 'bldc', 'بازده کل موتور؛ صنعتی ≥90%');
+  field('bldcRa', 'مقاومت فاز سیم‌پیچ', 'R_phase', 'ohm', 0.08, 0.001, 20, 'bldc', 'مقاومت هر فاز سیم‌پیچ');
+  field('bldcKvTarget', 'Kv هدف (0=محاسبه)', 'Kv_target', 'RPM/V', 0, 0, 50000, 'bldc', 'اگر 0 باشد از ولتاژ و دور محاسبه می‌شود');
+  field('bldcSlots', 'تعداد شیار استاتور', 'N_slots', '', 12, 3, 144, 'bldc', 'تعداد شیار سیم‌پیچ؛ معمولاً ۱۲، ۱۸، ۲۴، ۳۶');
+  field('bldcJ', 'چگالی جریان سیم', 'J_bldc', 'A/mm2', 5, 1, 15, 'bldc', 'عمومی: تا ۸ | صنعتی: ۳-۵ برای خنک‌کاری');
+  field('bldcFill', 'ضریب پرشدگی شیار', 'Ku_bldc', '%', 40, 20, 75, 'bldc');
+  field('bldcSafetyESC', 'ضریب ایمنی انتخاب ESC', 'k_esc', '', 1.3, 1.1, 3, 'bldc', 'عمومی: ۱٫۳ | صنعتی: ۱٫۵-۲٫۰');
   field('mType', 'نوع موتور', 'motor_type', '', 1, 0, 2, 'motor', 'تک‌فاز (0) | سه‌فاز (1) | DC (2)');
   field('dcVa', 'ولتاژ آرمیچر DC', 'V_a', 'V', 220, 12, 800, 'motor', 'ولتاژ آرمیچر موتور DC؛ فقط برای نوع DC');
   field('dcVf', 'ولتاژ تحریک DC', 'V_f', 'V', 220, 12, 800, 'motor', 'ولتاژ سیم‌پیچ تحریک؛ برای تحریک جداگانه');
@@ -343,6 +360,26 @@
   row('motor', 'موتور DC - تحریک', 'dcEff', 'بازده موتور DC', '%', mul(100, div('pMech', add('pMech', 'dcPLoss', 'dcPf'))));
   row('motor', 'موتور DC - کنترل', 'dcSpeedBase', 'سرعت پایه از ولتاژ و K.φ', 'RPM', mul(div('dcEb', 'dcKphi'), div(60, mul(2, Math.PI))));
   row('motor', 'موتور DC - کنترل', 'dcStartR', 'مقاومت استارت پیشنهادی', 'ohm', div(sub('dcVa', mul('dcKphi', 'dcOmega')), mul('dcIa', 2.5)));
+
+  // --- محاسبات موتور براشلس BLDC/PMSM ---
+  row('bldc', 'مشخصات پایه', 'kv', 'ثابت سرعت Kv', 'RPM/V', div('bldcRPM', 'bldcVbus'));
+  row('bldc', 'مشخصات پایه', 'kt', 'ثابت گشتاور Kt', 'N.m/A', div(60, mul(2, Math.PI, 'kv')));
+  row('bldc', 'مشخصات پایه', 'fElec', 'فرکانس الکتریکی', 'Hz', div(mul('bldcRPM', 'bldcPoles'), 120));
+  row('bldc', 'مشخصات پایه', 'omegaMech', 'سرعت زاویه‌ای مکانیکی', 'rad/s', div(mul(2, Math.PI, 'bldcRPM'), 60));
+  row('bldc', 'گشتاور و جریان', 'torqueBLDC', 'گشتاور نامی', 'N.m', div(mul('bldcPower', 1000), div(mul(2, Math.PI, 'bldcRPM'), 60)));
+  row('bldc', 'گشتاور و جریان', 'iShaft', 'جریان فاز نامی', 'A', div('torqueBLDC', 'kt'));
+  row('bldc', 'گشتاور و جریان', 'iBus', 'جریان باس DC', 'A', div('bldcPower', mul('bldcVbus', pct('bldcEff'))));
+  row('bldc', 'گشتاور و جریان', 'iPhaseRMS', 'جریان فاز RMS', 'A', div('iBus', sqrt(3)));
+  row('bldc', 'گشتاور و جریان', 'iPeak', 'جریان پیک فاز', 'A', mul('iPhaseRMS', sqrt(2)));
+  row('bldc', 'توان و بازده', 'pElecBLDC', 'توان الکتریکی ورودی', 'W', mul('bldcVbus', 'iBus'));
+  row('bldc', 'توان و بازده', 'pCuBLDC', 'تلفات مس سیم‌پیچ', 'W', mul(3, sq('iPhaseRMS'), 'bldcRa'));
+  row('bldc', 'توان و بازده', 'pLossBLDC', 'مجموع تلفات', 'W', sub('pElecBLDC', 'bldcPower'));
+  row('bldc', 'توان و بازده', 'effBLDC', 'بازده محاسبه‌شده', '%', mul(100, div('bldcPower', 'pElecBLDC')));
+  row('bldc', 'سیم‌پیچ و هندسه', 'aCuBLDC', 'سطح مس هر فاز', 'mm2', div('iPhaseRMS', 'bldcJ'));
+  row('bldc', 'سیم‌پیچ و هندسه', 'turnsPerSlot', 'دور مؤثر هر شیار', 'turn', ceil(div(mul('bldcFill', pct(100)), 1)));
+  row('bldc', 'سیم‌پیچ و هندسه', 'backEMF', 'Back-EMF در دور نامی', 'V', mul('kv', div('bldcVbus', 1)));
+  row('bldc', 'سیم‌پیچ و هندسه', 'escCurrentRating', 'جریان مجاز ESC', 'A', mul('iBus', 'bldcSafetyESC'));
+  row('bldc', 'پیشنهاد قطعه', 'suggestedBLDC', 'کلاس موتور و ESC پیشنهادی', '', 0);
   row('common', 'کنترل بودجه توان', 'knownLoss', 'جمع محافظه‌کارانه اقلام تلفات', 'W', add('mosLoss', 'diodeW', 'bridgeLoss', 'senseW', 'driveW', 'snubNomW', 'bleedW'));
 
   function referencesOf(expr) {
@@ -355,12 +392,15 @@
   function scope(moduleId) {
     if (!modules[moduleId]) return { id: 'all', fields: fields, rows: rows, displayRows: rows, supportRows: [] };
     if (scopeCache[moduleId]) return scopeCache[moduleId];
+    var standaloneIds2 = ['ironcore', 'ironcore-ind', 'motor', 'motor-ind', 'bldc', 'bldc-ind'];
+    var baseModId = moduleId.replace('-ind', '');
     var commonKeys = moduleId === 'input'
       ? ['pout', 'pin', 'lossBudget', 'rectMin', 'rectMax', 'busMin']
-      : (moduleId === 'ironcore' || moduleId === 'motor')
+      : standaloneIds2.indexOf(moduleId) !== -1
         ? []
         : ['pout', 'pin', 'lossBudget', 'psec', 'rectMin', 'rectMax', 'busMin', 'fHz', 'period'];
-    var displayRows = rows.filter(function (r) { return r.module === moduleId || commonKeys.indexOf(r.key) !== -1; });
+    var effectiveModuleId = standaloneIds2.indexOf(moduleId) !== -1 ? baseModId : moduleId;
+    var displayRows = rows.filter(function (r) { return r.module === (effectiveModuleId || moduleId) || commonKeys.indexOf(r.key) !== -1; });
     var required = {}, byKey = {};
     rows.forEach(function (r) { byKey[r.key] = r; });
     function include(key) {
@@ -369,7 +409,8 @@
       if (byKey[key]) referencesOf(byKey[key].expr).forEach(include);
     }
     displayRows.forEach(function (r) { include(r.key); });
-    if (moduleId !== 'input' && moduleId !== 'ironcore' && moduleId !== 'motor') ['idle', 'designIdle', 'designIdleWorst', 'bLimit'].forEach(include);
+    var standaloneIds = ['ironcore', 'ironcore-ind', 'motor', 'motor-ind', 'bldc', 'bldc-ind'];
+    if (moduleId !== 'input' && standaloneIds.indexOf(moduleId) === -1) ['idle', 'designIdle', 'designIdleWorst', 'bLimit'].forEach(include);
     var displayKeys = displayRows.map(function (r) { return r.key; });
     var basicList = modules[moduleId].basics || [];
     scopeCache[moduleId] = {
@@ -423,11 +464,19 @@
     var plan = scope(moduleId);
     var values = {}, errors = {}, issues = [], computed = [];
 
+    var activeModule = modules[moduleId];
     plan.fields.forEach(function (f) {
       var n = parseNumber(raw[f.key]);
       if (!Number.isFinite(n) || n < f.min || n > f.max) errors[f.key] = 'عدد بین ' + f.min + ' و ' + f.max + ' وارد کنید.';
       else values[f.key] = n;
     });
+    // appClassFixed: صنعتی یا عمومی از تعریف ماژول
+    if (activeModule && typeof activeModule.appClassFixed === 'number') {
+      values.iAppClass = activeModule.appClassFixed;
+      values.mAppClass = activeModule.appClassFixed;
+      values.bldcSafetyESC = activeModule.appClassFixed > 0.5 ? 1.5 : 1.3;
+      values.bldcEff = activeModule.appClassFixed > 0.5 ? Math.max(values.bldcEff || 82, 88) : (values.bldcEff || 82);
+    }
 
     if (Object.keys(errors).length) {
       return { valid: false, modelValid: false, scope: plan.id, fields: plan.fields, values: values, errors: errors, issues: [], rows: [], displayRows: [], supportRows: [], results: {} };
@@ -501,6 +550,19 @@
 
     // ۶. پیشنهاد فریم موتور القایی
     var suggestedMotor = '';
+    // ۷. پیشنهاد کلاس موتور BLDC و ESC
+    var suggestedBLDC = '';
+    if (Number.isFinite(values.bldcPower) && Number.isFinite(values.bldcVbus)) {
+      var pw = values.bldcPower, vb = values.bldcVbus, ib = values.iBus || (pw / vb);
+      var isIndBLDC = plan.id === 'bldc-ind';
+      var bldcClass = isIndBLDC ? ' [صنعتی / Servo Grade]' : ' [عمومی / Hobby Grade]';
+      if (pw <= 100) suggestedBLDC = 'موتور: 2204–2212 Outrunner | ESC: ' + Math.ceil(ib * (values.bldcSafetyESC || 1.3)) + 'A' + bldcClass;
+      else if (pw <= 500) suggestedBLDC = 'موتور: 2814–3508 Outrunner | ESC: ' + Math.ceil(ib * (values.bldcSafetyESC || 1.3)) + 'A' + bldcClass;
+      else if (pw <= 1500) suggestedBLDC = 'موتور: 4012–5010 یا Inrunner 57mm | ESC: ' + Math.ceil(ib * (values.bldcSafetyESC || 1.3)) + 'A' + bldcClass;
+      else if (pw <= 5000) suggestedBLDC = 'موتور: Inrunner 63–80mm | ESC/Inverter: ' + Math.ceil(ib * (values.bldcSafetyESC || 1.5)) + 'A' + bldcClass;
+      else suggestedBLDC = 'موتور: Inrunner 80–130mm صنعتی | Inverter: ' + Math.ceil(ib * (values.bldcSafetyESC || 2)) + 'A' + bldcClass;
+    }
+
     var motClass = values.mAppClass > 0.5 ? ' | IE3/IE4 صنعتی - IEC 60034' : ' | IE1/IE2 عمومی';
     var isDC = values.mType > 1.5;
     if (isDC && Number.isFinite(values.pMech)) {
@@ -536,6 +598,7 @@
       if (r.key === 'suggestedMosfet') noteText = suggestedMosfet;
       if (r.key === 'suggestedDiode') noteText = suggestedDiode;
       if (r.key === 'suggestedEI') noteText = suggestedEI;
+      if (r.key === 'suggestedBLDC') noteText = suggestedBLDC;
       if (r.key === 'suggestedMotor') noteText = suggestedMotor;
 
       computed.push(Object.assign({}, r, { 

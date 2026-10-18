@@ -605,3 +605,21 @@ div:has(> span:contains("fx")),
     display: none !important;
   }
 }
+
+/* extra-section-heading: زیر سکشن‌های جدید */
+.extra-section-heading { margin-top: 8px; margin-bottom: 20px; }
+.extra-section-heading h2 { font-size: 22px; }
+
+/* two-card-grid: گرید دو‌کارتی با عرض نصف (۲ از ۴ ستون) */
+.two-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* card-ironcore-ind */
+.card-ironcore-ind { --card-accent: #e8b87a; --accent-rgb: 232, 184, 122; }
+/* card-motor-ind */
+.card-motor-ind { --card-accent: #6ab0e8; --accent-rgb: 106, 176, 232; }
+/* card-bldc */
+.card-bldc { --card-accent: #a8d4b8; --accent-rgb: 168, 212, 184; }
+/* card-bldc-ind */
+.card-bldc-ind { --card-accent: #78c4a0; --accent-rgb: 120, 196, 160; }
+
+/* انیمیشن BLDC: روتور می‌چرخد */
