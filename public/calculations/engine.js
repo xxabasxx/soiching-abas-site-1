@@ -366,7 +366,7 @@
   row('bldc', 'مشخصات پایه', 'kt', 'ثابت گشتاور Kt', 'N.m/A', div(60, mul(2, Math.PI, 'kv')));
   row('bldc', 'مشخصات پایه', 'fElec', 'فرکانس الکتریکی', 'Hz', div(mul('bldcRPM', 'bldcPoles'), 120));
   row('bldc', 'مشخصات پایه', 'omegaMech', 'سرعت زاویه‌ای مکانیکی', 'rad/s', div(mul(2, Math.PI, 'bldcRPM'), 60));
-  row('bldc', 'گشتاور و جریان', 'torqueBLDC', 'گشتاور نامی', 'N.m', div(mul('bldcPower', 1000), div(mul(2, Math.PI, 'bldcRPM'), 60)));
+  row('bldc', 'گشتاور و جریان', 'torqueBLDC', 'گشتاور نامی', 'N.m', div('bldcPower', div(mul(2, Math.PI, 'bldcRPM'), 60)));
   row('bldc', 'گشتاور و جریان', 'iShaft', 'جریان فاز نامی', 'A', div('torqueBLDC', 'kt'));
   row('bldc', 'گشتاور و جریان', 'iBus', 'جریان باس DC', 'A', div('bldcPower', mul('bldcVbus', pct('bldcEff'))));
   row('bldc', 'گشتاور و جریان', 'iPhaseRMS', 'جریان فاز RMS', 'A', div('iBus', sqrt(3)));
@@ -376,7 +376,10 @@
   row('bldc', 'توان و بازده', 'pLossBLDC', 'مجموع تلفات', 'W', sub('pElecBLDC', 'bldcPower'));
   row('bldc', 'توان و بازده', 'effBLDC', 'بازده محاسبه‌شده', '%', mul(100, div('bldcPower', 'pElecBLDC')));
   row('bldc', 'سیم‌پیچ و هندسه', 'aCuBLDC', 'سطح مس هر فاز', 'mm2', div('iPhaseRMS', 'bldcJ'));
-  row('bldc', 'سیم‌پیچ و هندسه', 'turnsPerSlot', 'دور مؤثر هر شیار', 'turn', ceil(div(mul('bldcFill', pct(100)), 1)));
+  row('bldc', 'سیم‌پیچ و هندسه', 'coilsPerPhase', 'تعداد کویل هر فاز', '', div('bldcSlots', 3));
+  row('bldc', 'سیم‌پیچ و هندسه', 'turnsPerCoil', 'تعداد دور هر کویل', 'turn', ceil(div(mul(30, 'bldcVbus'), mul(Math.PI, 'bldcRPM', 'kt', 'coilsPerPhase'))));
+  row('bldc', 'سیم‌پیچ و هندسه', 'turnsPerPhase', 'تعداد دور هر فاز', 'turn', mul('turnsPerCoil', 'coilsPerPhase'));
+  row('bldc', 'سیم‌پیچ و هندسه', 'wireGauge', 'قطر سیم از چگالی جریان', 'mm', sqrt(div(mul(4, 'iPhaseRMS'), mul(Math.PI, 'bldcJ'))));
   row('bldc', 'سیم‌پیچ و هندسه', 'backEMF', 'Back-EMF در دور نامی', 'V', mul('kv', div('bldcVbus', 1)));
   row('bldc', 'سیم‌پیچ و هندسه', 'escCurrentRating', 'جریان مجاز ESC', 'A', mul('iBus', 'bldcSafetyESC'));
   row('bldc', 'پیشنهاد قطعه', 'suggestedBLDC', 'کلاس موتور و ESC پیشنهادی', '', 0);

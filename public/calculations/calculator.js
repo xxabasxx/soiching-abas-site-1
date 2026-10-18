@@ -12,8 +12,9 @@
   var state = Object.assign({}, E.defaults), result = null;
   var configuration = { supplyType: module.supplyType || E.supplyType, topology: module.topology || E.topology };
   function defaultProjectName() {
-    if (moduleId === 'ironcore') return translate('پروژه ترانس هسته آهن');
-    if (moduleId === 'motor') return translate('پروژه الکتروموتور');
+    if (moduleId === 'ironcore' || moduleId === 'ironcore-ind') return translate('پروژه ترانس هسته آهن');
+    if (moduleId === 'motor' || moduleId === 'motor-ind') return translate('پروژه الکتروموتور');
+    if (moduleId === 'bldc' || moduleId === 'bldc-ind') return translate('پروژه موتور براشلس');
     return translate('پروژه منبع تغذیه ۱۲ ولت');
   }
   var projectName = defaultProjectName(), notes = '';
