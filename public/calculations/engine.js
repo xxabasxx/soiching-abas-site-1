@@ -5,28 +5,32 @@
   var SUPPLY_TYPE = 'ac-dc-isolated';
   var TOPOLOGY = 'flyback-dcm';
 
+  // Only switching topologies appear in the selector of the supply-design sections.
+  // Standalone module families (iron core / motor / BLDC) are separate pages, not options here.
   var designOptions = {
     supplyTypes: [
       { value: SUPPLY_TYPE, label: 'AC/DC ایزوله', supported: true },
-      { value: 'dc-dc-isolated', label: 'DC/DC ایزوله', supported: false },
-      { value: 'ac-ac', label: 'AC/AC متناوب', supported: false }
+      { value: 'dc-dc-isolated', label: 'DC/DC ایزوله', supported: true },
+      { value: 'ac-ac', label: 'AC/AC متناوب', supported: true }
     ],
     topologies: [
-      { value: TOPOLOGY, label: 'فلای‌بک DCM', supported: true },
-      { value: 'flyback-ccm', label: 'فلای‌بک CCM', supported: false },
-      { value: 'forward', label: 'فوروارد', supported: false },
-      { value: 'push-pull', label: 'پوش-پول', supported: false },
-      { value: 'half-bridge', label: 'نیم‌پل', supported: false },
-      { value: 'full-bridge', label: 'تمام‌پل', supported: false },
-      { value: 'iron-ei', label: 'ترانس EI هسته آهن', supported: false },
-      { value: 'induction-motor', label: 'الکتروموتور القایی', supported: false }
+      { value: TOPOLOGY, label: 'فلای‌بک DCM (پیکربندی فعلی)', supported: true },
+      { value: 'flyback-ccm', label: 'فلای‌بک CCM', supported: true },
+      { value: 'forward', label: 'فوروارد (تک‌سوییچ با سیم‌پیچ ریست)', supported: true },
+      { value: 'push-pull', label: 'پوش-پول — در نسخه بعدی', supported: false },
+      { value: 'half-bridge', label: 'نیم‌پل — در نسخه بعدی', supported: false },
+      { value: 'full-bridge', label: 'تمام‌پل — در نسخه بعدی', supported: false }
     ]
   };
 
   // Only pairs with a real numerical model in this file are acceptable.
-  // The four flyback sections share flyback-dcm; standalone modules carry their own pair.
   var supportedConfigurations = [
     'ac-dc-isolated|flyback-dcm',
+    'dc-dc-isolated|flyback-dcm',
+    'ac-dc-isolated|flyback-ccm',
+    'dc-dc-isolated|flyback-ccm',
+    'ac-dc-isolated|forward',
+    'dc-dc-isolated|forward',
     'ac-ac|iron-ei',
     'ac-ac|iron-ei-ind',
     'ac-ac|induction-motor',
@@ -40,11 +44,15 @@
     return supportedConfigurations.indexOf(String(config.supplyType) + '|' + String(config.topology)) !== -1;
   }
 
+  function isForwardProject(topology) { return topology === 'forward'; }
+  function isCcmProject(topology) { return topology === 'flyback-ccm'; }
+  function isFlybackFamily(topology) { return topology === 'flyback-dcm' || topology === 'flyback-ccm'; }
+
   var modules = {
     input: { title: 'ورودی و یکسوساز', english: 'INPUT & RECTIFIER', subtitle: 'از برق ورودی تا یک باس DC مطمئن.', accent: '#d8a77f', summary: ['bulkStd', 'busMin', 'lineRms'] },
     transformer: { title: 'طراحی ترانسفورماتور', english: 'TRANSFORMER DESIGN', subtitle: 'از مشخصات اولیه تا هسته، سیم‌پیچ، گپ و پیشنهاد قطعه.', accent: '#d8a77f', summary: ['lp', 'np', 'ns'] },
     switching: { title: 'سوئیچینگ و کنترل', english: 'SWITCHING & CONTROL', subtitle: 'کلید قدرت، محدودکننده جریان، اسنابر و پیشنهاد ماسفت.', accent: '#d8a77f', summary: ['vdsRating', 'senseR', 'mosLoss'] },
-    output: { title: 'فیلتر و خروجی', english: 'OUTPUT & FILTER', subtitle: 'خازن، دیود یکسوساز و پیشنهاد دیود خروجی.', accent: '#d8a77f', summary: ['coutStd', 'rippleActual', 'diodeVr'] },
+    output: { title: 'فیلتر و خروجی', english: 'OUTPUT & FILTER', subtitle: 'خازن، دیود یکسوساز و پیشنهاد دیود خروجی.', accent: '#d8a77f', summary: ['coutStd', 'rippleActual', 'diodeVr'], displayKeys: { forward: ['loadR', 'fwdLo', 'fwdLoIs', 'fwdDiodeAvg', 'fwdDiodeVr', 'fwdDiodePeak', 'fwdLoRipple', 'fwdLoStd', 'fwdCoRip', 'fwdCoStep', 'fwdCoReq', 'fwdCoStd', 'fwdLoEsr', 'fwdRipTotal', 'fwdTransient', 'fwdCoVl', 'fwdFc0', 'fwdPhaseHint', 'fwdDampHint'] } },
     ironcore: { title: 'محاسبات هسته آهن', english: 'IRON CORE DESIGN', subtitle: 'ترانس فرکانس شبکه؛ هسته EI، سیم‌پیچ، تلفات و پیشنهاد سایز.', accent: '#dca678', summary: ['tpv', 'npIron', 'nsIron'], basics: ['iType', 'vPrim', 'vSec', 'iSec', 'fNet'], supplyType: 'ac-ac', topology: 'iron-ei', standaloneModule: true, badge: 'IRON CORE / 50-60Hz', badgeNote: 'طراحی ترانس EI فرکانس شبکه؛ ورودی اولیه، ثانویه، جریان و فرکانس.', configNote: 'این ماژول مستقل از فلای‌بک است. ورودی‌های اختصاصی خودش را وارد کنید.', tip: 'ولتاژ اولیه، ولتاژ ثانویه، جریان ثانویه و فرکانس شبکه را وارد کنید.' },
     motor: { title: 'محاسبات الکتروموتور', english: 'MOTOR DESIGN', subtitle: 'محاسبات استاتور، روتور، گشتاور و پیشنهاد نوع موتور.', accent: '#8daeda', summary: ['torque', 'rpm', 'effMotor'], basics: ['mType', 'mVolt', 'mPower', 'mPoles', 'mFreq'], supplyType: 'ac-ac', topology: 'induction-motor', standaloneModule: true, badge: 'INDUCTION MOTOR', badgeNote: 'موتور القایی متناوب؛ ولتاژ، توان، قطب‌ها و فرکانس.', configNote: 'این ماژول مستقل است. ولتاژ تغذیه، توان، تعداد قطب و فرکانس را وارد کنید.', tip: 'نوع موتور، ولتاژ تغذیه، توان مکانیکی، تعداد قطب و فرکانس شبکه را وارد کنید.' },
     'ironcore-ind': { title: 'ترانس هسته آهن — صنعتی', english: 'IRON CORE / INDUSTRIAL', subtitle: 'ترانس صنعتی Hi-B با ضریب ایمنی بالا.', accent: '#dca678', summary: ['tpv', 'npIron', 'nsIron'], basics: ['iType', 'vPrim', 'vSec', 'iSec', 'fNet'], supplyType: 'ac-ac', topology: 'iron-ei-ind', standaloneModule: true, badge: 'IRON CORE / INDUSTRIAL', badgeNote: 'ترانس صنعتی هسته آهن EI با ورق سیلیکون Hi-B.', configNote: 'مدل صنعتی: ورق Hi-B، ضریب ایمنی ۱٫۱۵، چگالی شار ۱٫۳T.', tip: 'نوع، ولتاژ اولیه، ثانویه، جریان و فرکانس را وارد کنید.', appClassFixed: 1 },
@@ -278,6 +286,27 @@
   row('output', 'فیلتر LC اختیاری', 'postIsat', 'تحمل اشباع هدف پس‌فیلتر', 'A', mul('io', add(1, div('postRipple', 200)), 1.25));
   row('output', 'فیلتر LC اختیاری', 'postZ', 'امپدانس مشخصه پس‌فیلتر', 'ohm', sqrt(div('postL', 'postCap')));
 
+  // --- Forward single-switch output stage (buck-derived; only visible for topology 'forward') ---
+  row('output', 'فیلتر خروجی Forward', 'fwdLoadR', 'مقاومت بار معادل', 'ohm', div('vo', 'io'));
+  row('output', 'فیلتر خروجی Forward', 'fwdLo', 'اندوکتانس موردنیاز فیلتر خروجی', 'uH', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdLoRipple', 'ریپل جریان سلف هدف', 'A', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdLoStd', 'اندوکتانس پیشنهادی E12', 'uH', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdLoIs', 'تحمل اشباع سلف (Isat هدف)', 'A', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdDiodeAvg', 'جریان متوسط دیود هرزگرد', 'A', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdDiodeVr', 'ریتینگ ولتاژ معکوس دیود هرزگرد', 'V', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdDiodePeak', 'پیک تحمل لازم دیود هرزگرد', 'A', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdCoRip', 'ظرفیت موردنیاز از ریپل', 'uF', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdCoStep', 'ظرفیت موردنیاز از پله بار', 'uF', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdCoReq', 'ظرفیت نامی موردنیاز', 'uF', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdCoStd', 'ظرفیت نامی پیشنهادی', 'uF', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdLoEsr', 'سقف ESR خازن از بودجه ریپل', 'mohm', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdRipTotal', 'ریپل خروجی برآوردی کل', 'mV pp', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdTransient', 'افت برآوردی پله بار', 'mV', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdCoVl', 'ریتینگ ولتاژ خازن خروجی', 'V', 0);
+  row('output', 'فیلتر خروجی Forward', 'fwdFc0', 'فرکانس رزونانس LC خروجی', 'Hz', 0);
+  row('output', 'حلقه کنترل Forward', 'fwdPhaseHint', 'فرکانس صفر ESR (راهنمای حاشیه فاز)', 'Hz', 0);
+  row('output', 'حلقه کنترل Forward', 'fwdDampHint', 'نسبت افتِ طراحی LC برای گزینش میرایی', '', 0);
+
   row('switching', 'تنش و حس جریان', 'vdsPeak', 'تنش برآوردی درین', 'V', add('rectMax', 'vrActual', 'spike'));
   row('switching', 'تنش و حس جریان', 'vdsRating', 'حداقل ریتینگ VDS پیشنهادی', 'V', mul('vdsPeak', margin('voltMargin')));
   row('switching', 'تنش و حس جریان', 'mosIpk', 'تحمل پیک جریان MOSFET', 'A', mul('ipLimit', 1.25));
@@ -400,25 +429,81 @@
   row('bldc', 'پیشنهاد قطعه', 'suggestedBLDC', 'کلاس موتور و ESC پیشنهادی', '', 0);
   row('common', 'کنترل بودجه توان', 'knownLoss', 'جمع محافظه‌کارانه اقلام تلفات', 'W', add('mosLoss', 'diodeW', 'bridgeLoss', 'senseW', 'driveW', 'snubNomW', 'bleedW'));
 
+  // --- CCM flyback model (support rows; the CCM application layer stamps the numbers) ---
+  row('common', 'مدل CCM', 'lpC', 'اندوکتانس CCM محاسبه‌شده', 'uH', 0);
+  row('common', 'مدل CCM', 'iavgC', 'میانگین جریان ورودی CCM', 'A', 0);
+  row('common', 'مدل CCM', 'deltaIpC', 'ریپل جریان اولیه (ΔIpp)', 'A', 0);
+  row('common', 'مدل CCM', 'ipkC', 'پیک جریان مگنتایز CCM', 'A', 0);
+  row('common', 'مدل CCM', 'ipCCMrms', 'RMS اولیه CCM در بار نامی', 'A', 0);
+  row('common', 'مدل CCM', 'isRmsC', 'RMS ثانویه CCM در بار نامی', 'A', 0);
+  row('common', 'مدل CCM', 'dCh', 'دیوتی رسیده CCM در باس مینیمم', '%', 0);
+  row('common', 'مدل CCM', 'dHighC', 'دیوتی CCM در باس ماکزیمم', '%', 0);
+  row('common', 'مدل CCM', 'dDemagC', 'سهم تخلیه CCM', '%', 0);
+  row('common', 'مدل CCM', 'dSumC', 'مجموع Ton+Toff در CCM', '%', 0);
+  row('common', 'مدل CCM', 'dIdleC', 'زمان بی‌جریانی در CCM', '%', 0);
+  row('common', 'مدل CCM', 'tOnC', 'زمان روشن CCM', 'us', 0);
+  row('common', 'مدل CCM', 'tOffC', 'زمان خاموش CCM', 'us', 0);
+  row('common', 'مدل CCM', 'bMeanC', 'شتاب شار متوسط در CCM', 'T', 0);
+  row('common', 'مدل CCM', 'deltaBC', 'تغییر شار CCM (ΔBac)', 'T', 0);
+  row('common', 'مدل CCM', 'wireAreaPC', 'سطح مس اولیه CCM', 'mm2', 0);
+  row('common', 'مدل CCM', 'wireAreaSC', 'سطح مس ثانویه CCM', 'mm2', 0);
+  row('common', 'مدل CCM', 'rhpz', 'صفر نیم‌صفحه راست CCM (RHPZ)', 'Hz', 0);
+  row('common', 'مدل CCM', 'rhpzKhz', 'RHPZ (کیلوهرتز)', 'kHz', 0);
+  row('common', 'مدل CCM', 'cliffA', 'جریان پیک معادل اگر همان نقطه DCM بود', 'A', 0);
+
+  // --- Forward single-switch model (support rows; the forward layer stamps the numbers) ---
+  row('common', 'مدل Forward', 'dF', 'دیوتی رسیده Forward', '%', 0);
+  row('common', 'مدل Forward', 'tonF', 'زمان روشن Forward', 'us', 0);
+  row('common', 'مدل Forward', 'tdemagF', 'زمان ریست سیم‌پیچ (معادل Toff)', 'us', 0);
+  row('common', 'مدل Forward', 'dDemagF', 'سهم زمان ریست', '%', 0);
+  row('common', 'مدل Forward', 'resetMargin', 'حاشیه ریست (۰.۵−D)', '%', 0);
+  row('common', 'مدل Forward', 'iFwdIn', 'جریان ورودی باس Forward', 'A', 0);
+  row('common', 'مدل Forward', 'iFwdIpk', 'پیک جریان سوییچ Forward', 'A', 0);
+  row('common', 'مدل Forward', 'iFwdInRMS', 'RMS جریان سوییچ Forward', 'A', 0);
+  row('common', 'مدل Forward', 'fwdIpkLim', 'آستانه محدودیت جریان Forward', 'A', 0);
+
   function referencesOf(expr) {
     if (typeof expr === 'string') return [expr];
     if (!Array.isArray(expr)) return [];
     return expr.slice(1).reduce(function (all, item) { return all.concat(referencesOf(item)); }, []);
   }
 
+  // Each module+topology pair gets the real, shaped scope: rows, dependencies and display list.
   var scopeCache = {};
-  function scope(moduleId) {
-    if (!modules[moduleId]) return { id: 'all', fields: fields, rows: rows, displayRows: rows, supportRows: [] };
-    if (scopeCache[moduleId]) return scopeCache[moduleId];
-    var standaloneIds2 = ['ironcore', 'ironcore-ind', 'motor', 'motor-ind', 'bldc', 'bldc-ind'];
+  function scope(moduleId, topology) {
+    topology = topology || TOPOLOGY;
+    if (!modules[moduleId]) return { id: 'all', topology: topology, fields: fields, rows: rows, displayRows: rows, supportRows: [] };
+    var cacheKey = moduleId + '|' + topology;
+    if (scopeCache[cacheKey]) return scopeCache[cacheKey];
+    var standaloneIds = ['ironcore', 'ironcore-ind', 'motor', 'motor-ind', 'bldc', 'bldc-ind'];
+    var isStandalone = standaloneIds.indexOf(moduleId) !== -1;
     var baseModId = moduleId.replace('-ind', '');
     var commonKeys = moduleId === 'input'
       ? ['pout', 'pin', 'lossBudget', 'rectMin', 'rectMax', 'busMin']
-      : standaloneIds2.indexOf(moduleId) !== -1
+      : isStandalone
         ? []
         : ['pout', 'pin', 'lossBudget', 'psec', 'rectMin', 'rectMax', 'busMin', 'fHz', 'period'];
-    var effectiveModuleId = standaloneIds2.indexOf(moduleId) !== -1 ? baseModId : moduleId;
+    var effectiveModuleId = isStandalone ? baseModId : moduleId;
     var displayRows = rows.filter(function (r) { return r.module === (effectiveModuleId || moduleId) || commonKeys.indexOf(r.key) !== -1; });
+    var overrides = null;
+    if (!isStandalone) {
+      if (topology === 'forward') {
+        var fwdKeys = moduleId === 'switching'
+          ? ['senseR', 'senseW', 'mosIpk']
+            : ((moduleId === 'input') ? [] : [].concat((modules[moduleId].displayKeys && modules[moduleId].displayKeys[topology]) || []));
+        if (moduleId === 'output') fwdKeys = fwdKeys.map(function (k) { return k === 'loadR' ? 'fwdLoadR' : k; });
+        if (fwdKeys.length) {
+          displayRows = rows.filter(function (r) {
+            if (commonKeys.indexOf(r.key) !== -1) return true;
+            if (fwdKeys.indexOf(r.key) !== -1) return true;
+            return false;
+          });
+          overrides = {};
+          fwdKeys.forEach(function (k) { overrides[k] = k; });
+        }
+      }
+    }
+    overrides = overrides || {};
     var required = {}, byKey = {};
     rows.forEach(function (r) { byKey[r.key] = r; });
     function include(key) {
@@ -427,18 +512,23 @@
       if (byKey[key]) referencesOf(byKey[key].expr).forEach(include);
     }
     displayRows.forEach(function (r) { include(r.key); });
-    var standaloneIds = ['ironcore', 'ironcore-ind', 'motor', 'motor-ind', 'bldc', 'bldc-ind'];
-    if (moduleId !== 'input' && standaloneIds.indexOf(moduleId) === -1) ['idle', 'designIdle', 'designIdleWorst', 'bLimit'].forEach(include);
-    var displayKeys = displayRows.map(function (r) { return r.key; });
+    if (moduleId !== 'input' && !isStandalone) {
+      if (topology === 'forward') ['bLimit', 'dDemagF'].forEach(include);
+      else if (topology === 'flyback-ccm') ['dOn', 'dDemagC', 'dSumC', 'dIdleC', 'bLimit'].forEach(include);
+      else ['idle', 'designIdle', 'designIdleWorst', 'bLimit'].forEach(include);
+    }
+    var displayKeySet = displayRows.map(function (r) { return r.key; });
     var basicList = modules[moduleId].basics || [];
-    scopeCache[moduleId] = {
+    scopeCache[cacheKey] = {
       id: moduleId,
+      topology: topology,
+      overrides: overrides,
       fields: fields.filter(function (f) { return required[f.key] || basicList.indexOf(f.key) !== -1; }),
       rows: rows.filter(function (r) { return required[r.key]; }),
       displayRows: displayRows,
-      supportRows: rows.filter(function (r) { return required[r.key] && displayKeys.indexOf(r.key) === -1; })
+      supportRows: rows.filter(function (r) { return required[r.key] && displayKeySet.indexOf(r.key) === -1; })
     };
-    return scopeCache[moduleId];
+    return scopeCache[cacheKey];
   }
 
   function evaluate(expr, values) {
@@ -493,11 +583,41 @@
     return Number(normalized);
   }
 
-  function calculate(raw, moduleId) {
-    var plan = scope(moduleId);
+  function calculate(raw, moduleId, topology) {
+    var activeModule = moduleId ? modules[moduleId] : modules.transformer; // implicit whole-model top view
+    if (moduleId && !activeModule) return { valid: false, modelValid: false, scope: moduleId, topology: topology, fields: [], values: {}, errors: { project: 'بخش محاسباتی نامشخص است.' }, issues: [], rows: [], displayRows: [], supportRows: [], results: {} };
+    if (topology === undefined) topology = activeModule.topology || TOPOLOGY;
+    // Each standalone module carries its own topology; the four supply sections accept a shared one.
+    if (activeModule.standaloneModule && (!topology || topology === TOPOLOGY || topology === 'flyback-ccm' || topology === 'forward')) {
+      topology = activeModule.topology;
+    }
+    var plan = scope(moduleId, topology);
+
+    // Switching-topology inputs that every supply section needs to solve D / turns before shaping
+    var supplyShared = !activeModule.standaloneModule;
+    if (supplyShared && topology !== TOPOLOGY) {
+      plan = (function () {
+        var seen = {}, outFields = [], outRows = [];
+        var ownScope = plan;
+        var extraScope = scope('transformer', topology);
+        var baseFields = (moduleId === 'output') ? scope('output', TOPOLOGY).fields : ownScope.fields;
+        baseFields.concat(extraScope.fields).forEach(function (f) {
+          if (seen[f.key]) return;
+          seen[f.key] = true;
+          outFields.push(f);
+        });
+        ownScope.rows.concat(extraScope.rows).forEach(function (r) {
+          if (seen[r.key]) return;
+          seen[r.key] = true;
+          outRows.push(r);
+        });
+        var nextPlan = Object.assign({}, plan, { fields: outFields, rows: outRows });
+        return nextPlan;
+      })();
+    }
+
     var values = {}, errors = {}, issues = [], computed = [];
 
-    var activeModule = modules[moduleId];
     plan.fields.forEach(function (f) {
       var n = parseNumber(raw[f.key]);
       if (!Number.isFinite(n) || n < f.min || n > f.max) errors[f.key] = 'عدد بین ' + f.min + ' و ' + f.max + ' وارد کنید.';
@@ -512,18 +632,210 @@
     }
 
     if (Object.keys(errors).length) {
-      return { valid: false, modelValid: false, scope: plan.id, fields: plan.fields, values: values, errors: errors, issues: [], rows: [], displayRows: [], supportRows: [], results: {} };
+      return { valid: false, modelValid: false, scope: plan.id, topology: topology, fields: plan.fields, values: values, errors: errors, issues: [], rows: [], displayRows: [], supportRows: [], results: {} };
     }
 
     var symbols = {};
     fields.forEach(function (f) { symbols[f.key] = f.symbol; });
+
+    // --- Topology application-layer: reshape only the values the chosen model owns ---
+    var isFwd = isForwardProject(topology);
+    var isCcm = isCcmProject(topology);
+    var isDcm = topology === TOPOLOGY;
+
+    // CCM owns a fixed turns ratio Np/Ns = Vref/(Vo+Vd); the turn solver defines np, ns comes from it.
+    if (isCcm && Number.isFinite(values.vref) && Number.isFinite(values.vo) && Number.isFinite(values.vd)) {
+      values.ratio = values.vref / (values.vo + values.vd);
+      if (Number.isFinite(values.np)) values.ns = Math.max(1, Math.round(values.np / values.ratio));
+    }
+    // Forward owns the same ratio but solves ns first, then np.
+    if (isFwd && Number.isFinite(values.vref) && Number.isFinite(values.vo) && Number.isFinite(values.vd)) {
+      values.ratio = values.vref / (values.vo + values.vd);
+      if (Number.isFinite(values.ns)) values.np = Math.max(1, Math.ceil(values.ns * values.ratio));
+    }
 
     plan.rows.forEach(function (r) {
       var n = evaluate(r.expr, values);
       values[r.key] = n;
     });
 
-    // --- قیود میان‌پارامتری: فقط وقتی اعمال می‌شوند که همه کلیدها در دامنه همین بخش باشند ---
+    if (isCcm && !activeModule.standaloneModule) {
+      var ratioCcm = Number.isFinite(values.ratio) ? values.ratio : 0;
+      var solveCcm = Number.isFinite(values.busMin) && Number.isFinite(values.fHz) && Number.isFinite(values.pin) && ratioCcm > 0;
+      var dCCM = 0, lpCCM = 0;
+      if (solveCcm) {
+        // Closed form on the CCM boundary (K_RP = 1): Lp(D)=Vmin*D^2/(Pin*f*(2-D))
+        var lo = 1e-7, hi = 0.499, span = (hi - lo) / 24000, bestLp = 0, bestD = 0, bestErr = Infinity;
+        for (var dGuess = lo; dGuess < hi; dGuess += span) {
+          var denom = values.pin * values.fHz * (2 - dGuess);
+          if (denom <= 0) continue;
+          var lpGuess = values.busMin * dGuess * dGuess / denom;
+          var krpGuess = (1 - dGuess) * values.busMin * dGuess / (values.pin * values.fHz * lpGuess);
+          var err = Math.abs(krpGuess - 1);
+          if (err < bestErr) { bestErr = err; bestD = dGuess; bestLp = lpGuess; }
+          if (krpGuess <= 1) break;
+        }
+        dCCM = bestD; lpCCM = bestLp;
+      }
+      var iavgBus = solveCcm ? values.pin / values.busMin : 0;
+      var ipkCCM = solveCcm && dCCM > 0 ? (iavgBus * 2) / (dCCM * (2 - 1)) : 0;
+      var ipRmsCcm = ipkCCM * Math.sqrt(Math.max(0, dCCM / 3));
+      var isRmsCcm = solveCcm && values.ratio > 0 ? ipkCCM * values.ratio * Math.sqrt(Math.max(0, (1 - dCCM) / 3)) : 0;
+      var stampCcm = {
+        lp: lpCCM * 1e6,
+        lpC: lpCCM * 1e6,
+        dOn: dCCM * 100,
+        dCh: dCCM * 100,
+        dHighC: solveCcm && values.rectMax > 0 ? (ratioCcm > 0 ? (values.busMin * dCCM / (values.busMin || 1)) * (values.rectMax / (values.rectMax || 1)) : 0) * 100 : 0,
+        dDemag: (1 - dCCM) * 100,
+        dDemagC: (1 - dCCM) * 100,
+        dSumC: dCCM * 100 + (1 - dCCM) * 100,
+        dIdleC: 0,
+        tOnC: dCCM * (values.period || 0),
+        tOffC: (1 - dCCM) * (values.period || 0),
+        iavgC: iavgBus,
+        ipDesign: ipkCCM,
+        ipOp: ipkCCM,
+        ipLimit: ipkCCM * (1 + (values.oc || 0) / 100),
+        ipkC: ipkCCM,
+        deltaIpC: ipkCCM,
+        ipCCMrms: ipRmsCcm,
+        ipRms: ipRmsCcm,
+        ipRmsDesign: ipRmsCcm,
+        bNormal: solveCcm && values.np && values.ae ? (lpCCM * ipkCCM) / ((values.np) * (values.ae) * 1e-6) : 0,
+        bMeanC: 0,
+        clrA_: 0
+      };
+      stampCcm.cliffA = solveCcm && dCCM > 0 ? (2 * values.pin / (values.busMin * dCCM)) : 0;
+      if (Number.isFinite(values.np) && Number.isFinite(values.ae) && lpCCM > 0) {
+        stampCcm.bNormal = (lpCCM * stampCcm.ipDesign) / (values.np * values.ae * 1e-6);
+        stampCcm.bLimit = (lpCCM * (1 + (values.ltol || 0) / 100) * stampCcm.ipLimit) / (values.np * values.ae * 1e-6);
+        stampCcm.deltaBC = stampCcm.bNormal;
+      }
+      var ownedCcm = [
+        'lp', 'lpC', 'dOn', 'dCh', 'dDemag', 'dDemagC', 'dSumC', 'dIdleC', 'tOnC', 'tOffC',
+        'iavgC', 'deltaIpC', 'ipDesign', 'ipOp', 'ipLimit', 'ipkC', 'ipCCMrms', 'ipRms', 'ipRmsDesign',
+        'isPeak', 'isRms', 'isRmsC', 'bNormal', 'bMeanC', 'deltaBC', 'cliffA', 'rhpz', 'rhpzKhz'
+      ];
+      ownedCcm.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(stampCcm, k) && Number.isFinite(stampCcm[k])) values[k] = stampCcm[k]; });
+      if (Number.isFinite(values.ratio) && solveCcm) {
+        values.isPeak = stampCcm.ipDesign * values.ratio;
+        values.isRms = values.isPeak * Math.sqrt(Math.max(0, (1 - dCCM) / 3));
+        values.isRmsC = values.isRms;
+        values.capRms = Math.sqrt(Math.max(0, values.isRms * values.isRms - values.io * values.io));
+        values.secondaryMean = (values.isPeak + values.ipDesign * values.ratio) * (1 - dCCM) / 2;
+      }
+      values.designIdle = 1; values.designIdleWorst = 1; values.idle = 1; values.dIdleC = 0;
+      if (solveCcm && lpCCM > 0 && Number.isFinite(values.ratio) && values.io > 0) {
+        values.rhpz = (values.vo / values.io) * Math.pow(values.ratio, 2) / (2 * Math.PI * lpCCM) * Math.pow(1 - dCCM, 2);
+        values.rhpzKhz = values.rhpz / 1000;
+      }
+    }
+
+    if (isFwd && !activeModule.standaloneModule) {
+      var ratioF = Number.isFinite(values.ratio) ? values.ratio : 0;
+      var solveF = Number.isFinite(values.busMin) && Number.isFinite(values.fHz) && Number.isFinite(values.pout) && ratioF > 0;
+      var dF = 0, errF = Infinity;
+      if (solveF) {
+        for (var dGuessF = 1e-7; dGuessF < 0.48; dGuessF += 0.0005) {
+          var voltageReq = dGuessF * values.busMin / ratioF;
+          var errGuessF = Math.abs(voltageReq - (values.vo + values.vd));
+          if (errGuessF < errF) { errF = errGuessF; dF = dGuessF; }
+          if (voltageReq > (values.vo + values.vd)) break;
+        }
+      }
+      var iOut = values.io, vDrop = values.vo + values.vd;
+      var iFwdI = solveF ? iOut / ratioF : 0;
+      var rippleA = 0.3 * Math.max(0.1, iOut);
+      var iFwdIpk = solveF ? (iOut + 0.5 * rippleA) / ratioF : 0;
+      var iFwdInRMS = solveF ? iFwdI * Math.sqrt(Math.max(0.0001, dF)) : 0;
+      var loH = solveF ? (vDrop * (1 - dF)) / (values.fHz * rippleA) : 0;
+      var rippleBudgetmV = values.vo * values.rippleOut * 10;
+      var stepIF = values.io * (values.stepLoad / 100);
+      var droopV = values.vo * (values.droop / 100);
+      var capShareC = Math.max(0.1, (values.capShare || 50) / 100);
+      var stampF = {
+        dOn: dF * 100,
+        dF: dF * 100,
+        tonF: dF * (values.period || 0),
+        dDemag: dF * 100,
+        dDemagF: dF * 100,
+        tdemagF: dF * (values.period || 0),
+        resetMargin: (0.5 - dF) * 100,
+        ipDesign: iFwdIpk,
+        ipOp: iFwdIpk,
+        ipLimit: iFwdIpk * (1 + (values.oc || 0) / 100),
+        iFwdIn: iFwdI,
+        iFwdIpk: iFwdIpk,
+        iFwdInRMS: iFwdInRMS,
+        fwdIpkLim: iFwdIpk * (1 + (values.oc || 0) / 100),
+        fwdLo: loH * 1e6,
+        fwdLoRipple: rippleA,
+        fwdLoIs: solveF ? (iOut + 0.5 * rippleA) * 1.25 : 0,
+        fwdDiodeAvg: iOut * (1 - dF) * 1.4,
+        fwdDiodePeak: iFwdIpk * ratioF * 1.25,
+        fwdLoEsr: rippleBudgetmV > 0 ? (rippleBudgetmV * (1 - capShareC)) / Math.max(1e-9, rippleA) : 0,
+        fwdCoVl: values.vo * (1 + (values.voltMargin || 0) / 100)
+      };
+      stampF.fwdLoStd = preferred(stampF.fwdLo);
+      stampF.fwdCoRip = solveF && rippleBudgetmV > 0 && values.fHz > 0 ? (rippleA * 1e9) / (8 * values.fHz * rippleBudgetmV * capShareC) : 0;
+      stampF.fwdLoadR = values.vo > 0 && values.io > 0 ? values.vo / values.io : 0;
+      stampF.fwdCoStep = droopV > 0 ? 2.5 * stepIF * (values.responseUs || 0) / droopV : 0;
+      stampF.fwdCoReq = Math.max(stampF.fwdCoRip, stampF.fwdCoStep) / Math.max(0.2, 1 - (values.outTol || 0) / 100);
+      stampF.fwdCoStd = preferred(stampF.fwdCoReq);
+      stampF.fwdDiodeVr = solveF && ratioF > 0 ? ((values.rectMax || 0) / ratioF) * (1 + (values.voltMargin || 0) / 100) : 0;
+      stampF.fwdRipTotal = stampF.fwdCoStd > 0 && values.fHz > 0 ? (rippleA * 1e9) / (8 * values.fHz * (stampF.fwdCoStd / capShareC)) : 0;
+      stampF.fwdTransient = stampF.fwdCoStd > 0 ? (stepIF * (values.responseUs || 0) * 1e-6) / (stampF.fwdCoStd * 1e-6) * 1000 + stepIF * ((values.esr || 0) / 1000) * 1000 : 0;
+      stampF.fwdFc0 = stampF.fwdLoStd > 0 && stampF.fwdCoStd > 0 ? 1 / (2 * Math.PI * Math.sqrt((stampF.fwdLoStd * 1e-6) * (stampF.fwdCoStd * 1e-6))) : 0;
+      stampF.fwdPhaseHint = stampF.fwdLoEsr > 0 && stampF.fwdCoStd > 0 ? 1 / (2 * Math.PI * (stampF.fwdLoEsr * 1e-3) * (stampF.fwdCoStd * 1e-6)) : 0;
+      stampF.fwdDampHint = stampF.fwdLoStd > 0 && stampF.fwdCoStd > 0 && values.io > 0 ? Math.sqrt((stampF.fwdLoStd / (stampF.fwdCoStd / Math.max(1e-9, (values.vo / values.io) * (values.vo / values.io))))) : 0;
+      // switching section
+      stampF.senseR = stampF.fwdIpkLim > 0 && (values.cs || 0) > 0 ? values.cs / stampF.fwdIpkLim : 0;
+      stampF.senseW = stampF.senseR > 0 ? iFwdInRMS * iFwdInRMS * stampF.senseR : 0;
+      stampF.mosIpk = stampF.fwdIpkLim * 1.25;
+      stampF.vdsPeak = 2 * (values.rectMax || 0) + (values.spike || 0);
+      stampF.vdsRating = stampF.vdsPeak * (1 + (values.voltMargin || 0) / 100);
+      stampF.mosCond = iFwdInRMS * iFwdInRMS * (values.rds || 0);
+      stampF.mosSwitch = 0.5 * stampF.vdsPeak * iFwdIpk * ((values.tr || 0) + (values.tf || 0)) * 1e-9 * (values.fHz || 0);
+      stampF.mosCoss = values.coss ? 0.5 * values.coss * 1e-12 * stampF.vdsPeak * stampF.vdsPeak * (values.fHz || 0) : 0;
+      stampF.mosLoss = stampF.mosCond + stampF.mosSwitch + stampF.mosCoss;
+      stampF.sinkTheta = stampF.mosLoss > 0 ? (((values.tj || 0) - (values.ta || 0)) / stampF.mosLoss) - (values.rjc || 0) - (values.rcs || 0) : 0;
+      var ownedF = [
+        'dOn', 'dF', 'tonF', 'dDemag', 'dDemagF', 'tdemagF', 'resetMargin',
+        'ipDesign', 'ipOp', 'ipLimit', 'iFwdIn', 'iFwdIpk', 'iFwdInRMS', 'fwdIpkLim',
+        'vdsPeak', 'vdsRating', 'senseR', 'senseW', 'mosIpk', 'mosCond', 'mosSwitch', 'mosCoss', 'mosLoss', 'sinkTheta',
+        'fwdLo', 'fwdLoStd', 'fwdLoRipple', 'fwdLoIs', 'fwdDiodeAvg', 'fwdDiodeVr', 'fwdDiodePeak',
+        'fwdLoEsr', 'fwdCoRip', 'fwdCoStep', 'fwdCoReq', 'fwdCoStd', 'fwdRipTotal', 'fwdTransient', 'fwdCoVl', 'fwdFc0', 'fwdPhaseHint', 'fwdDampHint', 'fwdLoadR'
+      ];
+      ownedF.forEach(function (k) { if (Number.isFinite(stampF[k])) values[k] = stampF[k]; });
+      values.dIdleF = Math.max(0, 100 - values.dOn - values.dDemagF);
+      values.designIdle = 1; values.designIdleWorst = 1; values.idle = Math.max(1, values.dIdleF);
+      values.isPeak = values.ipDesign * ratioF;
+      values.isRms = values.isPeak * Math.sqrt(Math.max(0, (1 - dF) / 3));
+      values.capRms = Math.sqrt(Math.max(0, values.isRms * values.isRms - values.io * values.io));
+      values.secondaryMean = values.isPeak * (1 - dF) / 2;
+    }
+
+    // --- Controls after stamping-and-validation ---
+    var countStamp = 0;
+    plan.rows.forEach(function (r, idx) {
+      var val = values[r.key];
+      var noteText = r.note || '';
+      if (r.key === 'bridgeRec') noteText = bridgeRec;
+      if (r.key === 'suggestedCore') noteText = suggestedCore;
+      if (r.key === 'suggestedMosfet') noteText = suggestedMosfet;
+      if (r.key === 'suggestedDiode') noteText = suggestedDiode;
+      if (r.key === 'suggestedEI') noteText = suggestedEI;
+      if (r.key === 'suggestedBLDC') noteText = suggestedBLDC;
+      if (r.key === 'suggestedMotor') noteText = suggestedMotor;
+      computed[countStamp++] = Object.assign({}, r, {
+        value: typeof val === 'number' && Number.isFinite(val) ? val : 0,
+        note: noteText,
+        formula: formula(r.expr, symbols)
+      });
+    });
+
+// --- قیود میان‌پارامتری: فقط وقتی اعمال می‌شوند که همه کلیدها در دامنه همین بخش باشند ---
     function inScope() { for (var i = 0; i < arguments.length; i++) if (!Number.isFinite(values[arguments[i]])) return false; return true; }
     function domainError(cond, fieldKey, message) { if (cond && !errors[fieldKey]) errors[fieldKey] = message; }
 
@@ -541,8 +853,9 @@
     // --- کنترل‌های مدل: هشدارها و خطاهای سطح طراحی (فقط در دامنه همین بخش) ---
     function modelIssue(cond, level, key, message) { if (cond) issues.push({ level: level, key: key, text: message }); }
 
-    if (inScope('idle')) modelIssue(values.idle < 2, 'error', 'idle', 'حاشیه بی‌جریانی در بار نامی کمتر از ۲٪ است؛ مبدل در آستانه CCM قرار دارد — توان، فرکانس یا نقطه کار را اصلاح کنید.');
-    if (inScope('designIdleWorst')) modelIssue(values.designIdleWorst < 5, 'error', 'designIdleWorst', 'شرط DCM در بودجه توان و بدترین تلرانس Lp برقرار نیست؛ دیوتی طراحی یا ولتاژ بازتابی هدف را اصلاح کنید.');
+    if (inScope('idle') && !isCcm) modelIssue(!isFwd && values.idle < 2, 'error', 'idle', 'حاشیه بی‌جریانی در بار نامی کمتر از ۲٪ است؛ مبدل در آستانه CCM قرار دارد — توان، فرکانس یا نقطه کار را اصلاح کنید.');
+    if (inScope('designIdleWorst') && !isCcm) modelIssue(!isFwd && values.designIdleWorst < 5, 'error', 'designIdleWorst', 'شرط DCM در بودجه توان و بدترین تلرانس Lp برقرار نیست؛ دیوتی طراحی یا ولتاژ بازتابی هدف را اصلاح کنید');
+
     if (inScope('bLimit', 'bmax')) modelIssue(values.bLimit > values.bmax * 1.001, 'error', 'bLimit', 'چگالی شار در حد جریان از سقف طراحی عبور می‌کند؛ دور اولیه یا سطح مؤثر هسته را افزایش دهید.');
     if (inScope('fill', 'ku')) modelIssue(values.fill > values.ku, 'warning', 'fill', 'پرشدگی مس از حد مجاز پنجره بیشتر است؛ هسته بزرگ‌تر، سیم نازک‌تر یا تعداد رشته کمتر لازم است.');
     if (inScope('sinkTheta')) modelIssue(values.sinkTheta < 0, 'warning', 'sinkTheta', 'اتلاف حرارتی حتی در حد ایده‌آل ممکن نیست؛ MOSFET با تلفات کمتر یا فرکانس پایین‌تر انتخاب کنید.');
@@ -553,7 +866,17 @@
     if (inScope('pCuBLDC', 'bldcPower')) modelIssue(values.pCuBLDC > values.bldcPower * 0.25, 'warning', 'pCuBLDC', 'تلفات مس سیم‌پیچ نسبت به توان خروجی بالاست؛ مقاومت فاز کمتر یا هدایت خنک‌تر لازم است.');
     if (inScope('backEMF', 'bldcVbus')) modelIssue(values.backEMF < values.bldcVbus * 0.5, 'warning', 'backEMF', 'افت مقاومتی سیم‌پیچ سهم بزرگی از ولتاژ باس است؛ Ra کمتر یا جریان هدف پایین‌تر.');
 
+    if (isCcm && values.idle !== undefined && values.idle <= 1) {
+      issues.push({ level: 'info', key: 'mode', text: 'این نقطه‌ی کار در مرز DCM است؛ برای CCM واقعی بار یا فرکانس را کمتر کنید تا Lp بزرگ‌تر شود.' });
+    }
+    if (isFwd && Number.isFinite(values.resetMargin)) {
+      if (values.resetMargin <= 0) issues.push({ level: 'error', key: 'resetMargin', text: 'دیوتی بیش از ۵۰٪ است؛ سیم‌پیچ ریست ۱:۱ هسته را ریست نمی‌کند — np/ns کوچک‌تر یا ورودی بزرگ‌تر.' });
+      else if (values.resetMargin < 5) issues.push({ level: 'warning', key: 'resetMargin', text: 'حاشیه ریست بسیار کم است؛ بررسی چیدمان سیم‌پیچ ریست.' });
+    }
     var modelValid = !issues.some(function (issue) { return issue.level === 'error'; });
+    if (isCcm && Number.isFinite(values.rhpzKhz) && Number.isFinite(values.fs) && values.rhpzKhz < values.fs / 1000 * 0.5) {
+      issues.push({ level: 'warning', key: 'rhpz', text: 'صفر نیم‌صفحه راست (RHPZ) پایین است؛ حاشیه فاز حلقه باید مستقل بررسی شود.' });
+    }
 
     // --- منطق تعیین شماره قطعات تجاری (انتقال به ستون توضیحات) ---
     var pout = values.pout || (values.vo * values.io);
