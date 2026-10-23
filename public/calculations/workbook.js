@@ -82,6 +82,15 @@
     };
     if (!E.supportsConfiguration(configuration)) throw new Error(tr('نوع منبع و توپولوژی انتخاب‌شده در این نسخه پشتیبانی نمی‌شود.'));
     if (!E.modules[activeModule]) throw new Error('بخش محاسباتی مشخص نشده است.');
+    var supplyLabels = { 'ac-dc-isolated': 'AC/DC ایزوله', 'ac-ac': 'AC/AC متناوب', 'dc': 'DC / باتری' };
+    var topologyLabels = {
+      'flyback-dcm': 'فلای‌بک DCM',
+      'iron-ei': 'ترانس EI هسته آهن', 'iron-ei-ind': 'ترانس EI صنعتی Hi-B',
+      'induction-motor': 'الکتروموتور القایی', 'induction-motor-ind': 'الکتروموتور صنعتی IE3/IE4',
+      'bldc-general': 'موتور براشلس عمومی', 'bldc-industrial': 'موتور براشلس صنعتی'
+    };
+    var supplyLabel = supplyLabels[configuration.supplyType] || configuration.supplyType;
+    var topologyLabel = topologyLabels[configuration.topology] || configuration.topology;
     if (result.scope !== activeModule) result = E.calculate(result.values, activeModule);
     if (!result.valid || !result.modelValid) throw new Error('ورودی‌ها یا شرط DCM برای خروجی معتبر نیستند.');
     var sectionTitle = E.modules[activeModule].title;
@@ -91,8 +100,8 @@
       inputRows.push([{ value: f.symbol, style: 5 }, f.label, { value: f.unit, style: 5 }, { value: result.values[f.key], style: 3 }, f.min, f.max, f.note]);
     });
     // Configuration metadata is appended so the numeric input references keep their row addresses.
-    inputRows.push(['SUPPLY_TYPE', 'نوع منبع', '', 'AC/DC ایزوله', '', '', 'نوع منبع و توپولوژی، محدوده مدل این گزارش هستند.']);
-    inputRows.push(['TOPOLOGY', 'توپولوژی', '', 'فلای‌بک DCM', '', '', 'نوع منبع و توپولوژی، محدوده مدل این گزارش هستند.']);
+    inputRows.push(['SUPPLY_TYPE', 'نوع منبع', '', supplyLabel, '', '', 'نوع منبع و توپولوژی، محدوده مدل این گزارش هستند.']);
+    inputRows.push(['TOPOLOGY', 'توپولوژی', '', topologyLabel, '', '', 'نوع منبع و توپولوژی، محدوده مدل این گزارش هستند.']);
     result.displayRows.forEach(function (r, i) { references[r.key] = 'Calculations!$E$' + (i + 5); });
     result.supportRows.forEach(function (r, i) { references[r.key] = 'Dependencies!$E$' + (i + 5); });
     var headers = ['مرحله', 'پارامتر', 'نماد', 'رابطه', 'نتیجه', 'واحد', 'فرض / توضیح'];
@@ -113,25 +122,27 @@
     }
     var v = result.values, r = references;
     function has(key) { return Object.prototype.hasOwnProperty.call(r, key); }
-    check('حداقل و حداکثر ورودی', r.vacMax + '>=' + r.vacMin, v.vacMax >= v.vacMin, 'بازه ورودی باید مرتب باشد.');
-    check('کف باس مثبت', r.busMin + '>5', v.busMin > 5, 'مدل با کف باس کمتر از ۵ ولت معتبر نیست.');
-    check('محدوده ورودی‌های همین بخش', 'AND(' + result.fields.map(function (f) { return r[f.key] + '>=' + f.min + ',' + r[f.key] + '<=' + f.max; }).join(',') + ')', true, 'ورودی‌های نامرتبط در این workbook نیستند.');
+    if (has('vacMax') && has('vacMin')) check('حداقل و حداکثر ورودی', r.vacMax + '>=' + r.vacMin, v.vacMax >= v.vacMin, 'بازه ورودی باید مرتب باشد.');
+    if (has('busMin')) check('کف باس مثبت', r.busMin + '>5', v.busMin > 5, 'مدل با کف باس کمتر از ۵ ولت معتبر نیست.');
+    if (has('holdCutoff') && has('busMin')) check('حد نگه‌داری زیر کف باس', r.holdCutoff + '<' + r.busMin, v.holdCutoff < v.busMin, 'فقط انرژی نگه‌داری محاسبه می‌شود.');
+    if (has('ta') && has('tj')) check('دمای محیط و پیوند', r.ta + '<' + r.tj, v.ta < v.tj, 'دمای محیط باید از سقف دمای پیوند کمتر باشد.');
+    check('محدوده ورودی‌های همین بخش', 'AND(' + result.fields.map(function (f) { return r[f.key] + '>=' + f.min + ',' + r[f.key] + '<=' + f.max; }).join(',') + ')', true, 'ورودی‌های نامرتبط در این workbook نیستند.')
     if (has('psec')) check('سازگاری بودجه توان', r.pin + '>=' + r.psec, v.pin >= v.psec, 'توان ورودی حداقل باید خروجی و دیود را تأمین کند.');
     if (has('designIdleWorst')) check('DCM با تلرانس Lp', 'AND(' + r.idle + '>0,' + r.designIdle + '>0,' + r.designIdleWorst + '>0)', v.idle > 0 && v.designIdle > 0 && v.designIdleWorst > 0, 'در غیر این صورت روابط مراحل مغناطیسی معتبر نیستند.');
     if (has('bLimit')) check('شار در حد جریان', r.bLimit + '<=' + r.bmax, v.bLimit <= v.bmax, 'با Bsat و منحنی تلفات در دمای واقعی مقایسه شود.');
     if (has('fill')) check('پرشدگی پنجره', r.fill + '<=' + r.ku, v.fill <= v.ku, 'فضای عایق و بوبین مستقل بررسی شود.');
     if (has('rippleActual')) check('ریپل خروجی', r.rippleActual + '<=' + r.rippleTarget, v.rippleActual <= v.rippleTarget, 'ESL و نویز سوئیچینگ محاسبه نشده.');
-    if (has('holdCutoff')) check('حد نگه‌داری', r.holdCutoff + '<' + r.busMin, v.holdCutoff < v.busMin, 'فقط انرژی نگه‌داری محاسبه می‌شود.');
     if (has('safeV')) check('هدف تخلیه', r.safeV + '<' + r.rectMax, v.safeV < v.rectMax, 'هدف تخلیه باید کمتر از پیک باس باشد.');
     if (has('fbRef')) check('مرجع فیدبک', r.vo + '>' + r.fbRef, v.vo > v.fbRef, 'مقاومت بالایی باید مثبت باشد.');
-    if (has('sinkTheta')) check('مسیر حرارتی', r.sinkTheta + '>0', v.sinkTheta > 0, 'تحلیل پایا و برآوردی.');
-    if (has('esr')) check('بودجه افت گذرای ESR', '(' + r.vo + '*' + r.droop + '/100)>(' + r.stepI + '*' + r.esr + '/1000)', true, 'بودجه باقی‌مانده باید مثبت باشد.');
-    if (has('vPrim')) check('سطح ولتاژ', r.vPrim + '>=' + r.vSec, v.vPrim >= v.vSec, 'ولتاژ ورودی باید از خروجی بزرگتر باشد.');
-    if (has('regIron')) check('تنظیم ولتاژ', r.regIron + '<10', v.regIron <= 10, 'افت ولتاژ بالای ۱۰٪ توصیه نمی‌شود.');
+    if (has('sinkTheta')) check('مسیر حرارتی', r.sinkTheta + '>0', v.sinkTheta > 0, 'تحلیل پایا و برآوردی.')
+    if (has('esr')) check('بودجه افت گذرای ESR', '(' + r.vo + '*' + r.droop + '*10)>(' + r.stepI + '*' + r.esr + ')', v.vo * v.droop * 10 > v.stepI * v.esr, 'بودجه باقی‌مانده باید مثبت باشد.');
+    if (has('vPrim')) check('سطح ولتاژ', r.vPrim + '>=' + r.vSec, v.vPrim >= v.vSec, 'برای ترانس‌های کاهنده باید برقرار باشد؛ افزاینده مجاز است.');
+    if (has('regComp')) check('تنظیم ولتاژ', r.regComp + '<=15', v.regComp <= 15, 'جبران بیش از ۱۵٪ به معنی امپدانس بالای ترانس است.');
     if (has('mSlip')) check('محدوده لغزش', r.mSlip + '<10', v.mSlip <= 10, 'لغزش بالای ۱۰٪ نشانه بهره‌وری پایین است.');
+    if (has('backEMF')) check('سهم Back-EMF از باس', r.backEMF + '>' + r.bldcVbus + '*0.5', v.backEMF > v.bldcVbus * 0.5, 'افت مقاومتی زیاد یعنی سیم‌پیچ ضعیف یا جریان بیش از حد.');
     var sourceRows = heading('ABAS SOFT / فرض‌ها و منابع ' + sectionTitle, project, 'Engine ' + E.version + ' | ' + E.topology + ' | پیش‌طراحی اختصاصی یک بخش، نه طرح تأییدشده.', ['نوع', 'متن / منبع', 'نشانی']);
-    sourceRows.push(['نوع منبع', 'AC/DC ایزوله', '']);
-    sourceRows.push(['توپولوژی', 'فلای‌بک DCM', '']);
+    sourceRows.push(['نوع منبع', supplyLabel, '']);
+    sourceRows.push(['توپولوژی', topologyLabel, '']);
     sourceRows.push(['یادداشت پروژه', { value: project.notes || tr('بدون یادداشت'), literal: true }, '']);
     E.assumptions.forEach(function (text) { sourceRows.push(['فرض / محدودیت', text, '']); });
     result.issues.forEach(function (issue) { sourceRows.push([issue.level, issue.text, '']); });

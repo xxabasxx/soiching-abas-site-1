@@ -2,7 +2,7 @@ ABAS SOFT - Bilingual Flyback DCM design worksheets
 
 These are working calculators, not placeholders.
 
-VERSION 1.2 WORKSHEETS:
+WORKSHEETS:
 Every section shares the same darker charcoal reading theme. Start with four basic
 inputs; the advanced assumptions are collapsed and scoped to the section.
 No calculations or model self-tests run on initial load. Enter your values,
@@ -26,7 +26,9 @@ SOURCE AND TOPOLOGY:
 The initial input panel explicitly shows Supply type and Topology.
 The implemented combination is isolated AC/DC with a DCM flyback.
 Other supply types and topologies are visibly disabled and labelled as
-unsupported. This update does not implement DC/DC, CCM, LLC or bridge models.
+unsupported. DC/DC, CCM, LLC or bridge models are not implemented.
+The six standalone modules (iron core, motor, BLDC) carry their own valid
+supply/topology pairs and are the only other accepted combinations.
 Project JSON includes supplyType and topology. Legacy projects without a
 supplyType are interpreted as the previous isolated AC/DC model. Unsupported
 configurations are rejected, not silently calculated as a flyback.
@@ -50,6 +52,17 @@ Open ../offline.html for the offline home page, then choose a module:
   transformer.html   Lp, turns, currents, flux swing, gap and copper fill
   switching.html     MOSFET, sense resistor, losses, RCD and feedback divider
   output.html        Diode, capacitance, ESR, ripple and optional LC post-filter
+
+Six standalone worksheets follow the same worksheet engine with their own
+supply/topology models and their own project names:
+
+  ironcore.html / ironcore-ind.html   50/60 Hz EI transformer turns, EI sizing (industrial: Hi-B laminations)
+  motor.html / motor-ind.html         Induction and DC motor torque, current and frame suggestion (industrial: IE3/IE4)
+  bldc.html / bldc-ind.html           BLDC/PMSM Kv, Kt, currents and ESC sizing (BETA: report issues before relying on it)
+
+Projects saved in one section only load inside that section's model; loading a
+flyback project into a motor page (or the reverse) is rejected with a clear
+message instead of silently mixing parameters.
 
 Keep engine.js, workbook.js, calculator.js and calculator.css in this folder.
 JavaScript must be enabled. No server, network, CDN or npm installation is

@@ -8,22 +8,37 @@
   var designOptions = {
     supplyTypes: [
       { value: SUPPLY_TYPE, label: 'AC/DC ایزوله', supported: true },
-      { value: 'dc-dc-isolated', label: 'DC/DC ایزوله', supported: true },
-      { value: 'ac-ac', label: 'AC/AC متناوب', supported: true }
+      { value: 'dc-dc-isolated', label: 'DC/DC ایزوله', supported: false },
+      { value: 'ac-ac', label: 'AC/AC متناوب', supported: false }
     ],
     topologies: [
       { value: TOPOLOGY, label: 'فلای‌بک DCM', supported: true },
-      { value: 'flyback-ccm', label: 'فلای‌بک CCM', supported: true },
-      { value: 'forward', label: 'فوروارد', supported: true },
-      { value: 'push-pull', label: 'پوش-پول', supported: true },
-      { value: 'half-bridge', label: 'نیم‌پل', supported: true },
-      { value: 'full-bridge', label: 'تمام‌پل', supported: true },
-      { value: 'iron-ei', label: 'ترانس EI هسته آهن', supported: true },
-      { value: 'induction-motor', label: 'الکتروموتور القایی', supported: true }
+      { value: 'flyback-ccm', label: 'فلای‌بک CCM', supported: false },
+      { value: 'forward', label: 'فوروارد', supported: false },
+      { value: 'push-pull', label: 'پوش-پول', supported: false },
+      { value: 'half-bridge', label: 'نیم‌پل', supported: false },
+      { value: 'full-bridge', label: 'تمام‌پل', supported: false },
+      { value: 'iron-ei', label: 'ترانس EI هسته آهن', supported: false },
+      { value: 'induction-motor', label: 'الکتروموتور القایی', supported: false }
     ]
   };
 
-  function supportsConfiguration(config) { return true; }
+  // Only pairs with a real numerical model in this file are acceptable.
+  // The four flyback sections share flyback-dcm; standalone modules carry their own pair.
+  var supportedConfigurations = [
+    'ac-dc-isolated|flyback-dcm',
+    'ac-ac|iron-ei',
+    'ac-ac|iron-ei-ind',
+    'ac-ac|induction-motor',
+    'ac-ac|induction-motor-ind',
+    'dc|bldc-general',
+    'dc|bldc-industrial'
+  ];
+
+  function supportsConfiguration(config) {
+    if (!config || typeof config !== 'object') return false;
+    return supportedConfigurations.indexOf(String(config.supplyType) + '|' + String(config.topology)) !== -1;
+  }
 
   var modules = {
     input: { title: 'ورودی و یکسوساز', english: 'INPUT & RECTIFIER', subtitle: 'از برق ورودی تا یک باس DC مطمئن.', accent: '#d8a77f', summary: ['bulkStd', 'busMin', 'lineRms'] },
@@ -47,7 +62,7 @@
   field('vacMax', 'حداکثر ورودی AC', 'Vac_max', 'V RMS', 265, 30, 500, 'basic');
   field('vo', 'ولتاژ خروجی', 'Vo', 'V', 12, 1, 500, 'basic');
   field('io', 'جریان خروجی', 'Io', 'A', 5, 0.01, 100, 'basic');
-  field('eff', 'بازده تخمینی', 'eta_pct', '%', 85, 40, 98, 'electrical');
+  field('eff', 'بازده تخمینی', 'eta_pct', '%', 85, 40, 95, 'electrical');
   field('fs', 'فرکانس سوئیچینگ', 'fs_kHz', 'kHz', 65, 15, 500, 'electrical');
   field('duty', 'حد دیوتی طراحی', 'Dmax_pct', '%', 42, 5, 80, 'electrical');
   field('vref', 'ولتاژ بازتابی هدف', 'VR_target', 'V', 100, 10, 400, 'electrical');
@@ -234,6 +249,7 @@
   row('transformer', 'سیم و پرشدگی', 'strandsP', 'تعداد رشته موازی اولیه', '', ceil(div('wireAreaP', div(mul(Math.PI, sq('strand')), 4))));
   row('transformer', 'سیم و پرشدگی', 'strandsS', 'تعداد رشته موازی ثانویه', '', ceil(div('wireAreaS', div(mul(Math.PI, sq('strand')), 4))));
   row('transformer', 'سیم و پرشدگی', 'fill', 'پرشدگی مس با رشته‌های گرد شده', '%', div(mul(100, div(mul(Math.PI, sq('strand')), 4), add(mul('np', 'strandsP'), mul('ns', 'strandsS'))), 'aw'));
+  row('transformer', 'سیم و پرشدگی', 'fillMargin', 'حاشیه پرشدگی پنجره', '%', sub('ku', 'fill'));
   row('transformer', 'پیشنهاد قطعه تجاری', 'suggestedCore', 'سایز هسته پیشنهادی بازار', '', 0);
 
   row('output', 'بار و دیود', 'loadR', 'مقاومت بار معادل', 'ohm', div('vo', 'io'));
@@ -251,7 +267,7 @@
   row('output', 'خازن خروجی', 'coutTransient', 'ظرفیت مؤثر از پله بار', 'uF', div(mul('stepI', 'responseUs'), sub(mul('vo', pct('droop')), mul('stepI', 'esr', 0.001))));
   row('output', 'خازن خروجی', 'coutRequired', 'ظرفیت نامی موردنیاز', 'uF', div(op('MAX', 'coutRipple', 'coutTransient'), remain('outTol')));
   row('output', 'خازن خروجی', 'coutStd', 'ظرفیت نامی پیشنهادی E12', 'uF', op('PREF', 'coutRequired'));
-  row('output', 'خازن خروجی', 'coutEff', 'ظرفیت مؤثر بدترین حالت', 'uF', mul('bulkStd', remain('outTol')));
+  row('output', 'خازن خروجی', 'coutEff', 'ظرفیت مؤثر بدترین حالت', 'uF', mul('coutStd', remain('outTol')));
   row('output', 'خازن خروجی', 'esrMax', 'حد ESR از بودجه ریپل', 'mohm', div(mul('rippleTarget', remain('capShare')), 'isPeak'));
   row('output', 'خازن خروجی', 'rippleCap', 'ریپل خازنی برآوردشده', 'mV pp', div(mul('io', sq(sub(1, div('dDemag', 200))), 1e9), mul('fHz', 'coutEff')));
   row('output', 'خازن خروجی', 'rippleEsr', 'کران ریپل ناشی از ESR', 'mV pp', mul('isPeak', 'esr'));
@@ -377,10 +393,9 @@
   row('bldc', 'توان و بازده', 'effBLDC', 'بازده محاسبه‌شده', '%', mul(100, div('bldcPower', 'pElecBLDC')));
   row('bldc', 'سیم‌پیچ و هندسه', 'aCuBLDC', 'سطح مس هر فاز', 'mm2', div('iPhaseRMS', 'bldcJ'));
   row('bldc', 'سیم‌پیچ و هندسه', 'coilsPerPhase', 'تعداد کویل هر فاز', '', div('bldcSlots', 3));
-  row('bldc', 'سیم‌پیچ و هندسه', 'turnsPerCoil', 'تعداد دور هر کویل', 'turn', ceil(div(mul(30, 'bldcVbus'), mul(Math.PI, 'bldcRPM', 'kt', 'coilsPerPhase'))));
-  row('bldc', 'سیم‌پیچ و هندسه', 'turnsPerPhase', 'تعداد دور هر فاز', 'turn', mul('turnsPerCoil', 'coilsPerPhase'));
+  row('bldc', 'سیم‌پیچ و هندسه', 'raTarget', 'سقف مقاومت فاز برای حفظ بازده هدف', 'ohm', div(mul(0.6, 'pLossBLDC'), mul(3, sq('iPhaseRMS'))));
   row('bldc', 'سیم‌پیچ و هندسه', 'wireGauge', 'قطر سیم از چگالی جریان', 'mm', sqrt(div(mul(4, 'iPhaseRMS'), mul(Math.PI, 'bldcJ'))));
-  row('bldc', 'سیم‌پیچ و هندسه', 'backEMF', 'Back-EMF در دور نامی', 'V', mul('kv', div('bldcVbus', 1)));
+  row('bldc', 'سیم‌پیچ و هندسه', 'backEMF', 'Back-EMF برآوردی در دور نامی', 'V', op('MAX', 0, sub('bldcVbus', mul(2, 'iPhaseRMS', 'bldcRa'))));
   row('bldc', 'سیم‌پیچ و هندسه', 'escCurrentRating', 'جریان مجاز ESC', 'A', mul('iBus', 'bldcSafetyESC'));
   row('bldc', 'پیشنهاد قطعه', 'suggestedBLDC', 'کلاس موتور و ESC پیشنهادی', '', 0);
   row('common', 'کنترل بودجه توان', 'knownLoss', 'جمع محافظه‌کارانه اقلام تلفات', 'W', add('mosLoss', 'diodeW', 'bridgeLoss', 'senseW', 'driveW', 'snubNomW', 'bleedW'));
@@ -449,17 +464,32 @@
     }
   }
 
-  function formula(expr, references) {
+  // Shared expression-to-formula renderer. With plain symbols it feeds the UI fx-bar;
+  // with Excel cell references it must emit valid Excel function syntax.
+  function formula(expr, references, excel) {
     if (typeof expr === 'number') return String(expr);
     if (typeof expr === 'string') return references[expr] || expr;
-    var args = expr.slice(1).map(function (item) { return formula(item, references); });
-    return '(' + args.join(expr[0]) + ')';
+    var args = expr.slice(1).map(function (item) { return formula(item, references, excel); });
+    var head = expr[0];
+    if (head === '+' || head === '-' || head === '*' || head === '/' || head === '^') return '(' + args.join(' ' + head + ' ') + ')';
+    if (head === 'SQRT') return 'SQRT(' + args[0] + ')';
+    if (head === 'LN') return 'LN(' + args[0] + ')';
+    if (head === 'ROUNDUP') return 'ROUNDUP(' + args[0] + ', 0)';
+    if (head === 'MAX') return 'MAX(' + args.join(', ') + ')';
+    if (head === 'MIN') return 'MIN(' + args.join(', ') + ')';
+    if (head === 'PREF') {
+      var e12Range = 'Standards!$A$5:$A$' + (series.length + 4);
+      return excel
+        ? 'SMALL(' + e12Range + ', COUNTIF(' + e12Range + ', "<"&' + args[0] + ') + 1)'
+        : 'E12(' + args[0] + ')';
+    }
+    return head + '(' + args.join(', ') + ')';
   }
 
   function parseNumber(value) {
     if (typeof value === 'number') return value;
     if (typeof value !== 'string' || !value.trim()) return NaN;
-    var normalized = value.trim().replace(/[۰-۹]/g, function (c) { return c.charCodeAt(0) - 1776; }).replace(/٫/g, '.');
+    var normalized = value.trim().replace(/[۰-۹]/g, function (c) { return c.charCodeAt(0) - 1776; }).replace(/[٠-٩]/g, function (c) { return c.charCodeAt(0) - 1632; }).replace(/٫/g, '.');
     return Number(normalized);
   }
 
@@ -492,6 +522,38 @@
       var n = evaluate(r.expr, values);
       values[r.key] = n;
     });
+
+    // --- قیود میان‌پارامتری: فقط وقتی اعمال می‌شوند که همه کلیدها در دامنه همین بخش باشند ---
+    function inScope() { for (var i = 0; i < arguments.length; i++) if (!Number.isFinite(values[arguments[i]])) return false; return true; }
+    function domainError(cond, fieldKey, message) { if (cond && !errors[fieldKey]) errors[fieldKey] = message; }
+
+    if (inScope('vacMin', 'vacMax')) domainError(values.vacMax <= values.vacMin, 'vacMax', 'حداکثر ورودی باید از حداقل ورودی بیشتر باشد.');
+    if (inScope('busMin')) domainError(values.busMin <= 0, 'rippleIn', 'کف باس با این ریپل صفر یا منفی می‌شود؛ ریپل مجاز یا دامنه ورودی را اصلاح کنید.');
+    if (inScope('holdCutoff', 'busMin')) domainError(values.holdCutoff >= values.busMin, 'holdCutoff', 'قطع تنظیم باید کمتر از کف باس طراحی باشد.');
+    if (inScope('ta', 'tj')) domainError(values.ta >= values.tj, 'ta', 'دمای محیط باید از سقف دمای پیوند کمتر باشد.');
+    if (inScope('stepI', 'esr', 'vo', 'droop')) domainError(values.stepI * values.esr >= values.vo * values.droop * 10, 'esr', 'افت ESR در پله بار از بودجه افت خروجی بیشتر است؛ ESR کمتر یا افت مجاز بیشتر انتخاب کنید.');
+    if (inScope('bldcRPM', 'bldcPoles')) domainError(values.bldcPoles % 2 !== 0, 'bldcPoles', 'تعداد قطب آهنربا باید زوج باشد.');
+
+    if (Object.keys(errors).length) {
+      return { valid: false, modelValid: false, scope: plan.id, fields: plan.fields, values: values, errors: errors, issues: [], rows: [], displayRows: [], supportRows: [], results: {} };
+    }
+
+    // --- کنترل‌های مدل: هشدارها و خطاهای سطح طراحی (فقط در دامنه همین بخش) ---
+    function modelIssue(cond, level, key, message) { if (cond) issues.push({ level: level, key: key, text: message }); }
+
+    if (inScope('idle')) modelIssue(values.idle < 2, 'error', 'idle', 'حاشیه بی‌جریانی در بار نامی کمتر از ۲٪ است؛ مبدل در آستانه CCM قرار دارد — توان، فرکانس یا نقطه کار را اصلاح کنید.');
+    if (inScope('designIdleWorst')) modelIssue(values.designIdleWorst < 5, 'error', 'designIdleWorst', 'شرط DCM در بودجه توان و بدترین تلرانس Lp برقرار نیست؛ دیوتی طراحی یا ولتاژ بازتابی هدف را اصلاح کنید.');
+    if (inScope('bLimit', 'bmax')) modelIssue(values.bLimit > values.bmax * 1.001, 'error', 'bLimit', 'چگالی شار در حد جریان از سقف طراحی عبور می‌کند؛ دور اولیه یا سطح مؤثر هسته را افزایش دهید.');
+    if (inScope('fill', 'ku')) modelIssue(values.fill > values.ku, 'warning', 'fill', 'پرشدگی مس از حد مجاز پنجره بیشتر است؛ هسته بزرگ‌تر، سیم نازک‌تر یا تعداد رشته کمتر لازم است.');
+    if (inScope('sinkTheta')) modelIssue(values.sinkTheta < 0, 'warning', 'sinkTheta', 'اتلاف حرارتی حتی در حد ایده‌آل ممکن نیست؛ MOSFET با تلفات کمتر یا فرکانس پایین‌تر انتخاب کنید.');
+    if (inScope('rippleActual', 'rippleTarget')) modelIssue(values.rippleActual > values.rippleTarget, 'warning', 'rippleActual', 'ریپل برآوردی از بودجه ریپل خروجی بیشتر است؛ ظرفیت مؤثر خروجی را افزایش دهید یا ESR کمتر انتخاب کنید.');
+    if (inScope('transientDrop', 'vo', 'droop')) modelIssue(values.transientDrop > values.vo * values.droop * 10, 'warning', 'transientDrop', 'افت گذرای پله بار از بودجه افت مجاز بیشتر است؛ ظرفیت مؤثر بزرگ‌تر یا حلقه سریع‌تر لازم است.');
+    if (inScope('bulkValley', 'holdCutoff')) modelIssue(values.bulkValley < values.holdCutoff, 'warning', 'bulkValley', 'کف باس با ظرفیت پیشنهادی زیر نقطه قطع تنظیم می‌آید؛ ظرفیت بالک بزرگ‌تر یا نقطه قطع پایین‌تر.');
+    if (inScope('bDesign')) modelIssue(values.bDesign > 1.5, 'warning', 'bDesign', 'چگالی شار برای ورق EI معمولی بالاست؛ ورق سیلیکون Hi-B یا سطح مقطع بزرگ‌تر پیشنهاد می‌شود.');
+    if (inScope('pCuBLDC', 'bldcPower')) modelIssue(values.pCuBLDC > values.bldcPower * 0.25, 'warning', 'pCuBLDC', 'تلفات مس سیم‌پیچ نسبت به توان خروجی بالاست؛ مقاومت فاز کمتر یا هدایت خنک‌تر لازم است.');
+    if (inScope('backEMF', 'bldcVbus')) modelIssue(values.backEMF < values.bldcVbus * 0.5, 'warning', 'backEMF', 'افت مقاومتی سیم‌پیچ سهم بزرگی از ولتاژ باس است؛ Ra کمتر یا جریان هدف پایین‌تر.');
+
+    var modelValid = !issues.some(function (issue) { return issue.level === 'error'; });
 
     // --- منطق تعیین شماره قطعات تجاری (انتقال به ستون توضیحات) ---
     var pout = values.pout || (values.vo * values.io);
@@ -578,7 +640,7 @@
       else suggestedMotor = 'پیشنهاد DC: فریم 200M+ (بالای 37kW) | صنعتی سنگین';
       suggestedMotor += ' [DC جریان مستقیم]';
     }
-    if (Number.isFinite(values.pMech)) {
+    if (!isDC && Number.isFinite(values.pMech)) {
       var kw = values.pMech / 1000;
       if (kw <= 0.37) suggestedMotor = 'پیشنهاد: فریم 63 / 71 (0.12–0.37kW)' + motClass;
       else if (kw <= 0.75) suggestedMotor = 'پیشنهاد: فریم 80 (0.37–0.75kW)' + motClass;
@@ -615,7 +677,7 @@
 
     return {
       valid: true,
-      modelValid: true,
+      modelValid: modelValid,
       scope: plan.id,
       fields: plan.fields,
       values: values,
@@ -629,16 +691,58 @@
   }
 
   var assumptions = [
-    'محاسبات شامل تمام پارامترهای تخصصی سوئیچینگ + پیشنهاد قطعات تجاری بازار است.'
+    'مدل مشترک چهار بخش سوئیچینگ، فلای‌بک ایزوله تک‌خروجی با حالت DCM و فرکانس ثابت است؛ برای Forward، LLC، CCM و مدارهای پل معتبر نیست.',
+    'ماژول‌های هسته‌آهن و الکتروموتور بر اساس روابط تجربی استاندارد (معادله ۴.۴۴ ترانس، قواعد سایز هسته و فریم موتور) هستند و جای کاتالوگ سازنده را نمی‌گیرند.',
+    'همه نتایج پیش‌طراحی هستند؛ ساخت مدار متصل به برق شهر بدون بازبینی دیتاشیت، ملاحظات ایمنی و آزمون عملی مجاز نیست.',
+    'ساختمان عایقی، فواصل خزشی/هوایی (creepage/clearance) و الزامات استانداردهای ایمنی در این محاسبات طراحی نمی‌شوند.',
+    'تلفات هسته، اثر پوسته‌ای/مجاورت مرتبه دوم و پراکندگی پارامترهای ساخت در مدل تلفات دقیق لحاظ نشده‌اند.',
+    'طول گپ معادل بدون اثر فرینجینگ است؛ برای طراحی دقیق‌تر از روش McLyman استفاده کنید.',
+    'Coss، زمان‌های سوئیچ و اسپایک درین تخمینی‌اند و باید با اندازه‌گیری روی نمونه واقعی تنظیم شوند.',
+    'پایداری حلقه فیدبک و طراحی جبران‌ساز نیازمند دیتاشیت کنترلر و تست Bode/FRA است.',
+    'پیشنهادهای قطعات تجاری نقطه شروع جست‌وجو هستند، نه تأیید انتخاب نهایی.'
   ];
-  var sources = [];
-  function selfTest() { return { ok: true, count: 10 }; }
+  var sources = [
+    { title: 'TI — Designing a DCM Flyback Converter (SSZTCW6)', url: 'https://www.ti.com/lit/pdf/ssztcw6' },
+    { title: 'TI — Flyback Converter Design Considerations (SSZTCU9)', url: 'https://www.ti.com/lit/pdf/ssztcu9' },
+    { title: 'onsemi — AN-4137 Design Guidelines for Off-line Flyback Converters', url: 'https://www.onsemi.com/download/application-notes/pdf/an-4137.pdf' },
+    { title: 'Power Integrations — AN-17 Flyback Transformer Design for TOPSwitch', url: 'https://www.power.com/sites/default/files/forum/files/AN-17.pdf' }
+  ];
+
+  function selfTest() {
+    var run = 0, failures = [];
+    function pass(name, condition) { run += 1; if (!condition) failures.push(name); }
+    var ref = calculate(defaults), v = ref.values;
+    pass('baseline-valid', ref.valid === true);
+    pass('baseline-model', ref.modelValid === true);
+    pass('all-rows-finite', ref.rows.every(function (r) { return Number.isFinite(r.value); }));
+    pass('energy-design', Math.abs(0.5 * v.lp * 1e-6 * v.ipDesign * v.ipDesign * v.fHz - v.pin) < 1e-6 * Math.max(1, v.pin));
+    pass('energy-operating', Math.abs(0.5 * v.lp * 1e-6 * v.ipOp * v.ipOp * v.fHz - v.psec) < 1e-6 * Math.max(1, v.psec));
+    pass('secondary-balance', Math.abs(v.isPeak * v.dDemag / 200 - v.io) < 1e-9 * Math.max(1, v.io));
+    pass('capacitor-rms', Math.abs(v.capRms * v.capRms - (v.isRms * v.isRms - v.io * v.io)) < 1e-6 * Math.max(1, v.io * v.io));
+    pass('timing-sum', Math.abs(v.ton + v.tdemag + v.tidle - v.period) < 1e-9 * Math.max(1, v.period));
+    pass('flux-margin', v.bLimit <= v.bmax * 1.001);
+    pass('e12-round-up', v.bulkStd >= v.bulkRequired && v.coutStd >= v.coutRequired);
+    pass('series-midpoint', preferred(57) === 68);
+    pass('persian-digits', parseNumber('۱۲٫۵') === 12.5);
+    pass('arabic-digits', parseNumber('١٢٫٥') === 12.5);
+    pass('blank-rejected', !Number.isFinite(parseNumber('')));
+    pass('input-scope-clean', scope('input').supportRows.length === 0);
+    pass('dcm-block', calculate(Object.assign({}, defaults, { duty: 65, vref: 20 })).modelValid === false);
+    pass('cross-domain-block', calculate(Object.assign({}, defaults, { vacMax: 30, ta: 90 })).valid === false);
+    pass('esr-droop-block', calculate(Object.assign({}, defaults, { esr: 500 }), 'output').valid === false);
+    pass('unrelated-ignored', calculate(Object.assign({}, defaults, { esr: 500 }), 'transformer').valid === true);
+    pass('cout-consistent', v.coutEff <= v.coutStd && v.coutEff > v.coutStd * 0.5);
+    pass('bldc-model', (function () { var b = calculate(defaults, 'bldc'); return b.valid && b.values.backEMF > 0 && b.values.backEMF <= b.values.bldcVbus; })());
+    pass('standalone-scope', (function () { var i = calculate(defaults, 'ironcore'); return i.valid && i.rows.every(function (r) { return r.module === 'ironcore'; }); })());
+    return { ok: failures.length === 0, count: run, failures: failures };
+  }
 
   global.VoltaEngine = {
     version: VERSION,
     topology: TOPOLOGY,
     supplyType: SUPPLY_TYPE,
     designOptions: designOptions,
+    supportedConfigurations: supportedConfigurations,
     supportsConfiguration: supportsConfiguration,
     modules: modules,
     fields: fields,

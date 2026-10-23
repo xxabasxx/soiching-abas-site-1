@@ -49,6 +49,13 @@
   };
   function icon(name, size) { return '<svg width="' + (size || 17) + '" height="' + (size || 17) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (icons[name] || icons.info) + '</svg>'; }
   function esc(text) { return String(text == null ? '' : text).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function configurationLabels() {
+    var supplies = { 'ac-dc-isolated': 'AC/DC ایزوله', 'ac-ac': 'AC/AC متناوب', 'dc': 'DC / باتری' };
+    return {
+      supply: supplies[configuration.supplyType] || configuration.supplyType,
+      topology: module.standaloneModule ? module.badge : 'فلای‌بک DCM'
+    };
+  }
   function number(value, digits) {
     if (!Number.isFinite(value)) return 'نامعتبر';
     if (value !== 0 && Math.abs(value) < 0.001) return value.toExponential(3);
@@ -81,10 +88,15 @@
     return { schema: 'abas-soft-project', version: 1, engine: E.version, topology: configuration.topology, supplyType: configuration.supplyType, name: projectName.trim() || translate('پروژه بدون نام'), notes: notes, language: I ? I.getLanguage() : 'fa', updatedAt: new Date().toISOString(), activeModule: moduleId, values: values };
   }
   function validateProject(input) {
-    if (!input || typeof input !== 'object' || ['volta-smps-project', 'abas-soft-project'].indexOf(input.schema) === -1 || input.version !== 1 || input.topology !== E.topology || !input.values || typeof input.values !== 'object') {
+    if (!input || typeof input !== 'object' || ['volta-smps-project', 'abas-soft-project'].indexOf(input.schema) === -1 || input.version !== 1 || !input.values || typeof input.values !== 'object') {
       throw new Error('فایل .abas.json معتبر انتخاب کنید؛ فایل Excel ورودی پروژه نیست.');
     }
-    var loadedConfiguration = { supplyType: input.supplyType === undefined ? E.supplyType : input.supplyType, topology: input.topology };
+    var expectedTopology = module.standaloneModule ? (module.topology || moduleId) : E.topology;
+    var loadedTopology = input.topology === undefined ? expectedTopology : input.topology;
+    if (loadedTopology !== expectedTopology) {
+      throw new Error('این پروژه برای بخش دیگری ذخیره شده است؛ فایل را در صفحه همان بخش بارگذاری کنید.');
+    }
+    var loadedConfiguration = { supplyType: input.supplyType === undefined ? (module.supplyType || E.supplyType) : input.supplyType, topology: loadedTopology };
     if (!module.standaloneModule && !E.supportsConfiguration(loadedConfiguration)) throw new Error('نوع منبع و توپولوژی انتخاب‌شده در این نسخه پشتیبانی نمی‌شود.');
     var clean = {};
     E.fields.forEach(function (f) {
@@ -162,12 +174,12 @@
     '<a class="calc-skip-link" href="#worksheet">رفتن به برگه محاسبات</a>' +
     '<header class="calc-topbar"><div class="calc-topbar-inner">' + logo() + '<div class="calc-breadcrumb"><span>آزمایشگاه طراحی توان</span><b>/</b><strong>محاسبات تخصصی</strong></div><div class="calc-language-switch" role="group" aria-label="Language / زبان" dir="ltr" data-no-i18n><button type="button" data-language="fa" lang="fa">فارسی</button><span>/</span><button type="button" data-language="en" lang="en">EN</button></div><a class="home-link" data-home-link href="../index.html#calculations">بازگشت به همه بخش‌ها' + icon('back', 16) + '</a></div></header>' +
     '<div class="calc-commandbar"><div class="calc-command-inner"><div class="project-name-wrap"><span class="project-dot"></span><input id="project-name" aria-label="نام پروژه" maxlength="100" value="' + esc(projectName) + '"><span id="project-state">فضای کار شخصی شما</span></div><div class="calc-tools">' + tool('import', 'بارگذاری پروژه') + tool('save', 'ذخیره پروژه') + '<span class="toolbar-divider"></span>' + tool('print', 'چاپ نتایج') + tool('text', 'خروجی متن') + tool('excel', 'دریافت Excel', true) + '</div></div></div>' +
-    '<main class="calc-main"><section class="calculator-heading"><div><div class="calc-eyebrow"><span></span><span dir="ltr">' + module.english + '</span></div><h1>' + module.title + '<span>.</span></h1><p>چند ورودی از شما؛ محاسبات این بخش، گام‌به‌گام از ABAS SOFT.</p></div><div class="heading-signature" aria-hidden="true"><span dir="ltr">0' + sectionNumber + '<small> / 04</small></span><svg viewBox="0 0 180 55" fill="none"><path d="M0 28h25l12-15 17 30L74 5l19 44 17-30 14 19 9-10h47" stroke="currentColor" stroke-width="1.2"/></svg><small dir="ltr">PRECISION, ONE STEP AT A TIME</small></div></section>' +
+    '<main class="calc-main"><section class="calculator-heading"><div><div class="calc-eyebrow"><span></span><span dir="ltr">' + module.english + '</span></div><h1>' + module.title + '<span>.</span></h1><p>چند ورودی از شما؛ محاسبات این بخش، گام‌به‌گام از ABAS SOFT.</p></div><div class="heading-signature" aria-hidden="true"><span dir="ltr">' + String(sectionNumber).padStart(2, '0') + '<small> / ' + String(Object.keys(E.modules).length).padStart(2, '0') + '</small></span><svg viewBox="0 0 180 55" fill="none"><path d="M0 28h25l12-15 17 30L74 5l19 44 17-30 14 19 9-10h47" stroke="currentColor" stroke-width="1.2"/></svg><small dir="ltr">PRECISION, ONE STEP AT A TIME</small></div></section>' +
     '<nav class="calc-tabs" aria-label="بخش‌های طراحی">' + Object.keys(E.modules).map(function (id, i) { return '<a href="./' + id + '.html" data-module-link="' + id + '" class="' + (id === moduleId ? 'active' : '') + '"' + (id === moduleId ? ' aria-current="page"' : '') + '><span dir="ltr">0' + (i + 1) + '</span>' + E.modules[id].title + '</a>'; }).join('') + '</nav>' +
     '<div class="calculator-layout"><aside class="parameters-panel"><div class="panel-title"><div><span class="panel-eyebrow">قدم اول</span><h2>مشخصات اولیه</h2></div><button class="calc-icon-button" data-action="reset" title="بازگشت به مثال پیش‌فرض" aria-label="شروع دوباره با مثال پیش‌فرض">' + icon('refresh', 17) + '</button></div>' +
     '<form id="parameters-form" novalidate>' + configurationMarkup() + '<div class="basic-fields fields-grid">' + basics.map(fieldMarkup).join('') + '</div><p class="parameter-tip">' + esc(module.tip || 'با همین چهار مقدار شروع کنید. فرض‌های تکمیلی از پیش پر شده‌اند و باید با طراحی شما تطبیق داده شوند.') + '</p><div class="input-actions"><button type="submit" class="calculate-button">' + icon('play', 16) + '<span>محاسبه گام‌به‌گام</span>' + icon('arrow', 17) + '</button><p class="manual-start-hint">شروع فقط با این دکمه؛ هر ردیف با فاصله حدود ۰٫۸ ثانیه نمایش داده می‌شود.</p></div>' +
     '<details class="advanced-options" id="advanced-options"><summary>' + icon('sliders', 16) + '<span>فرض‌های پیشرفته این بخش</span>' + icon('fold', 14) + '</summary><div class="advanced-content">' + parameterGroup(groupNames.electrical, electrical) + parameterGroup(groupNames[moduleId], specific) + parameterGroup('فرض‌های مشترک مورد استفاده', inherited, 'فقط مقادیری که در روابط این بخش استفاده می‌شوند؛ نه تنظیمات کامل بخش‌های دیگر.') + '</div></details>' +
-    '<details class="project-notes"><summary>یادداشت پروژه' + icon('fold', 14) + '</summary><textarea id="project-notes" rows="3" maxlength="2000" placeholder="نام هسته، شماره قطعه یا نکته طراحی...">' + esc(notes) + '</textarea></details></form><div class="input-model-note">' + icon('shield', 16) + '<div><strong dir="ltr">FLYBACK / DCM</strong><p>' + (moduleId === 'input' ? 'ورودی و یکسوساز، مستقل از محاسبات هسته و خروجی.' : 'پیش‌طراحی ایزوله، تک‌خروجی و فرکانس ثابت.') + '</p></div></div><p id="storage-note" class="storage-note">پشتیبان دائمی: از «ذخیره پروژه» استفاده کنید.</p></aside>' +
+    '<details class="project-notes"><summary>یادداشت پروژه' + icon('fold', 14) + '</summary><textarea id="project-notes" rows="3" maxlength="2000" placeholder="نام هسته، شماره قطعه یا نکته طراحی...">' + esc(notes) + '</textarea></details></form><div class="input-model-note">' + icon('shield', 16) + '<div><strong dir="ltr">' + (module.standaloneModule ? module.badge : 'FLYBACK / DCM') + '</strong><p>' + (module.standaloneModule ? (module.badgeNote || '') : (moduleId === 'input' ? 'ورودی و یکسوساز، مستقل از محاسبات هسته و خروجی.' : 'پیش‌طراحی ایزوله، تک‌خروجی و فرکانس ثابت.')) + ' ' + 'نتایج پیش‌طراحی‌اند و جای بازبینی دیتاشیت، ملاحظات ایمنی و آزمون عملی را نمی‌گیرند.' + '</p></div></div><p id="storage-note" class="storage-note">پشتیبان دائمی: از «ذخیره پروژه» استفاده کنید.</p></aside>' +
     '<section class="worksheet-panel" id="worksheet" aria-label="برگه محاسبات مرحله‌ای"><div class="worksheet-title"><div><span class="sheet-eyebrow" dir="ltr">ABAS SOFT / LIVE WORKSHEET</span><h2>برگه ' + module.title + '</h2></div><div class="live-status" id="live-status" role="status" aria-live="polite"><span></span>آماده محاسبه</div></div>' +
     '<div class="worksheet-runbar"><div><span id="run-icon">' + icon('play', 13) + '</span><span id="run-caption">منتظر شروع محاسبات</span></div><div class="worksheet-run-actions"><button type="button" class="worksheet-replay" data-action="pause" data-pause-button hidden>' + icon('pause', 13) + 'توقف</button><button type="button" class="worksheet-replay" data-action="replay" id="worksheet-replay" disabled>' + icon('refresh', 13) + 'اجرای دوباره</button></div></div><div class="run-progress" role="progressbar" aria-label="پیشرفت نمایش محاسبات" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="run-progress-fill"></span></div>' +
     (module.standaloneModule ? '' : ('<div class="formula-bar"><span class="cell-address" id="cell-address" dir="ltr">E5</span><span class="fx-label" aria-hidden="true">fx</span><input id="formula-expression" aria-label="فرمول ردیف انتخاب‌شده" dir="ltr" readonly value=""><button class="calc-icon-button" data-action="formula" title="نمایش جایگذاری اعداد" aria-label="نمایش جایگذاری اعداد" aria-expanded="false" id="formula-toggle">' + icon('info', 15) + '</button></div><div id="formula-detail" class="formula-detail" hidden><span id="formula-description"></span><code id="numeric-expression" dir="ltr"></code></div>')) +
@@ -387,7 +399,8 @@
     return true;
   }
   function inputReportRows() {
-    return '<tr><td>نوع منبع</td><td>AC/DC ایزوله</td><td></td></tr><tr><td>توپولوژی</td><td>فلای‌بک DCM</td><td></td></tr>' + plan.fields.map(function (f) { return '<tr><td>' + esc(f.label) + '<small dir="ltr">' + esc(f.symbol) + '</small></td><td dir="ltr">' + fullNumber(result.values[f.key]) + '</td><td dir="ltr">' + esc(unit(f.unit)) + '</td></tr>'; }).join('');
+    var cfg = configurationLabels();
+    return '<tr><td>نوع منبع</td><td>' + esc(cfg.supply) + '</td><td></td></tr><tr><td>توپولوژی</td><td>' + esc(cfg.topology) + '</td><td></td></tr>' + plan.fields.map(function (f) { return '<tr><td>' + esc(f.label) + '<small dir="ltr">' + esc(f.symbol) + '</small></td><td dir="ltr">' + fullNumber(result.values[f.key]) + '</td><td dir="ltr">' + esc(unit(f.unit)) + '</td></tr>'; }).join('');
   }
   function renderPrint() {
     var appendix = document.getElementById('print-appendix');
@@ -528,7 +541,8 @@
   }
   function filename() { return (projectName.trim() || 'abas-soft-project').replace(/[<>:"/\\|?*\u0000-\u001f]/g, '-').slice(0, 65); }
   function textReport() {
-    var lines = ['ABAS SOFT | ' + module.title, 'پروژه: __PROJECT_NAME__', 'زمان: ' + new Date().toISOString(), 'نوع منبع: AC/DC ایزوله', 'توپولوژی: فلای‌بک DCM', 'مدل: Flyback DCM / ' + E.version, '', 'ورودی‌های استفاده‌شده در این بخش', '===================='].concat(
+    var cfg = configurationLabels();
+    var lines = ['ABAS SOFT | ' + module.title, 'پروژه: __PROJECT_NAME__', 'زمان: ' + new Date().toISOString(), 'نوع منبع: ' + cfg.supply, 'توپولوژی: ' + cfg.topology, 'مدل: ' + (module.standaloneModule ? module.topology : 'Flyback DCM') + ' / ' + E.version, '', 'ورودی‌های استفاده‌شده در این بخش', '===================='].concat(
       plan.fields.map(function (f) { return f.label + ' [' + f.symbol + '] = ' + fullNumber(result.values[f.key]) + ' ' + f.unit; }),
       ['', 'محاسبات ' + module.title, '===================='],
       result.displayRows.map(function (r, i) { return (i + 1) + '. ' + r.label + ' [' + r.key + ']\n   ' + r.formula + '\n   = ' + fullNumber(r.value) + ' ' + r.unit + (r.note ? '\n   ' + r.note : ''); }),

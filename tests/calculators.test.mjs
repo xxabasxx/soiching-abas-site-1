@@ -159,8 +159,9 @@ test('all four workbooks preserve every required formula and exclude unrelated r
   }
 });
 
-test('the four calculator themes share one accent and one stylesheet', async () => {
-  for (const id of Object.keys(E.modules)) assert.equal(E.modules[id].accent, '#d8a77f');
+test('the flyback sections share one accent and all modules share one stylesheet', async () => {
+  for (const id of ['input', 'transformer', 'switching', 'output']) assert.equal(E.modules[id].accent, '#d8a77f');
+  for (const id of Object.keys(E.modules)) assert.ok(/^#[0-9a-f]{6}$/i.test(E.modules[id].accent), `accent format: ${id}`);
   const script = await readFile(new URL('../public/calculations/calculator.js', import.meta.url), 'utf8');
   new vm.Script(script, { filename: 'calculator.js' });
   assert.ok(script.includes('E.calculate(state, moduleId)'));

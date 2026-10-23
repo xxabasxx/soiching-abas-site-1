@@ -11,6 +11,12 @@ import inputHtml from '../../public/calculations/input.html?raw';
 import transformerHtml from '../../public/calculations/transformer.html?raw';
 import switchingHtml from '../../public/calculations/switching.html?raw';
 import outputHtml from '../../public/calculations/output.html?raw';
+import ironcoreHtml from '../../public/calculations/ironcore.html?raw';
+import ironcoreIndHtml from '../../public/calculations/ironcore-ind.html?raw';
+import motorHtml from '../../public/calculations/motor.html?raw';
+import motorIndHtml from '../../public/calculations/motor-ind.html?raw';
+import bldcHtml from '../../public/calculations/bldc.html?raw';
+import bldcIndHtml from '../../public/calculations/bldc-ind.html?raw';
 import calculatorCss from '../../public/calculations/calculator.css?raw';
 import calculatorEngine from '../../public/calculations/engine.js?raw';
 import calculatorWorkbook from '../../public/calculations/workbook.js?raw';
@@ -45,6 +51,12 @@ const textAssets: Record<string, string> = {
   'calculations/transformer.html': transformerHtml,
   'calculations/switching.html': switchingHtml,
   'calculations/output.html': outputHtml,
+  'calculations/ironcore.html': ironcoreHtml,
+  'calculations/ironcore-ind.html': ironcoreIndHtml,
+  'calculations/motor.html': motorHtml,
+  'calculations/motor-ind.html': motorIndHtml,
+  'calculations/bldc.html': bldcHtml,
+  'calculations/bldc-ind.html': bldcIndHtml,
   'calculations/calculator.css': calculatorCss,
   'calculations/engine.js': calculatorEngine,
   'calculations/workbook.js': calculatorWorkbook,
