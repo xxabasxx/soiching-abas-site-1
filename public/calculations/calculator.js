@@ -91,10 +91,18 @@
     if (!input || typeof input !== 'object' || ['volta-smps-project', 'abas-soft-project'].indexOf(input.schema) === -1 || input.version !== 1 || !input.values || typeof input.values !== 'object') {
       throw new Error('فایل .abas.json معتبر انتخاب کنید؛ فایل Excel ورودی پروژه نیست.');
     }
-    var expectedTopology = module.standaloneModule ? (module.topology || moduleId) : E.topology;
-    var loadedTopology = input.topology === undefined ? expectedTopology : input.topology;
-    if (loadedTopology !== expectedTopology) {
-      throw new Error('این پروژه برای بخش دیگری ذخیره شده است؛ فایل را در صفحه همان بخش بارگذاری کنید.');
+    var sharedTopologies = ['flyback-dcm', 'flyback-ccm', 'forward', 'push-pull', 'half-bridge', 'full-bridge'];
+    var loadedTopology;
+    if (module.standaloneModule) {
+      loadedTopology = input.topology === undefined ? (module.topology || moduleId) : input.topology;
+      if (loadedTopology !== (module.topology || moduleId)) {
+        throw new Error('این پروژه برای بخش دیگری ذخیره شده است؛ فایل را در صفحه همان بخش بارگذاری کنید.');
+      }
+    } else {
+      loadedTopology = input.topology === undefined ? E.topology : input.topology;
+      if (sharedTopologies.indexOf(loadedTopology) === -1) {
+        throw new Error('این پروژه برای بخش دیگری ذخیره شده است؛ فایل را در صفحه همان بخش بارگذاری کنید.');
+      }
     }
     var loadedConfiguration = { supplyType: input.supplyType === undefined ? (module.supplyType || E.supplyType) : input.supplyType, topology: loadedTopology };
     if (!module.standaloneModule && !E.supportsConfiguration(loadedConfiguration)) throw new Error('نوع منبع و توپولوژی انتخاب‌شده در این نسخه پشتیبانی نمی‌شود.');
@@ -109,17 +117,18 @@
     var carried = location.hash.indexOf('#project=') === 0 ? decodeURIComponent(location.hash.slice(9)) : null;
     var saved = carried || localStorage.getItem(storageKey);
     // Ignore cached project name if switching entirely different modules (e.g. flyback to motor)
+    var acceptableTopologies = module.standaloneModule
+      ? [module.topology || moduleId]
+      : ['flyback-dcm', 'flyback-ccm', 'forward', 'push-pull', 'half-bridge', 'full-bridge'];
     if (saved) {
       try {
         var parsed = JSON.parse(saved);
-        var expectedTopology = module.standaloneModule ? (module.topology || moduleId) : (module.topology || E.topology);
-        if (parsed.topology !== expectedTopology) { saved = null; }
+        if (acceptableTopologies.indexOf(parsed.topology || E.topology) === -1) { saved = null; }
       } catch(e) {}
     }
     if (saved && saved.length < 100000) {
       var parsed = JSON.parse(saved);
-      var expectedTopology = module.standaloneModule ? (module.topology || moduleId) : (module.topology || E.topology);
-      if (parsed.topology !== expectedTopology) { throw new Error('Topology mismatch, ignoring cache'); }
+      if (acceptableTopologies.indexOf(parsed.topology || E.topology) === -1) { throw new Error('Topology mismatch, ignoring cache'); }
       var initial = validateProject(parsed);
       state = initial.values; configuration = initial.configuration; projectName = initial.name; notes = initial.notes;
     }
@@ -161,7 +170,7 @@
     if (module.standaloneModule) {
       return '<p id="configuration-error" class="field-error" role="alert"></p>';
     }
-    return '<fieldset class="source-configuration"><legend>نوع منبع و توپولوژی</legend><div class="configuration-fields"><label class="calc-field" for="supply-type"><span class="calc-field-label">نوع منبع</span><select id="supply-type" data-configuration="supplyType" aria-describedby="configuration-note">' + configurationOptions(E.designOptions.supplyTypes, configuration.supplyType) + '</select></label><label class="calc-field" for="design-topology"><span class="calc-field-label">توپولوژی</span><select id="design-topology" data-configuration="topology" aria-describedby="configuration-note">' + configurationOptions(E.designOptions.topologies, configuration.topology) + '</select></label></div><p id="configuration-note">مدل فعال این نسخه: AC/DC ایزوله با فلای‌بک DCM. گزینه‌های دیگر غیرفعال‌اند چون فرمول محاسباتی آن‌ها هنوز پیاده‌سازی نشده است.</p><p id="configuration-error" class="field-error" role="alert"></p></fieldset>';
+    return '<fieldset class="source-configuration"><legend>نوع منبع و توپولوژی</legend><div class="configuration-fields"><label class="calc-field" for="supply-type"><span class="calc-field-label">نوع منبع</span><select id="supply-type" data-configuration="supplyType" aria-describedby="configuration-note">' + configurationOptions(E.designOptions.supplyTypes, configuration.supplyType) + '</select></label><label class="calc-field" for="design-topology"><span class="calc-field-label">توپولوژی</span><select id="design-topology" data-configuration="topology" aria-describedby="configuration-note">' + configurationOptions(E.designOptions.topologies, configuration.topology) + '</select></label></div><p id="configuration-note">شش توپولوژی با مدل عددی تأییدشده فعال‌اند: فلای‌بک DCM/CCM، فوروارد، پوش‌پول، نیم‌پل و تمام‌پل. هر گزینه فقط وقتی فعال است که مدل ریاضی و تست مرجع آن در موتور وجود داشته باشد.</p><p id="configuration-error" class="field-error" role="alert"></p></fieldset>';
   }
   var basicKeys = module.basics || null;
   var basics = plan.fields.filter(function (f) { return basicKeys ? basicKeys.indexOf(f.key) !== -1 : f.group === 'basic'; });
@@ -488,7 +497,7 @@
     // Neither engine checks nor project calculations run before an explicit start.
     if (!engineTest) engineTest = E.selfTest();
     document.getElementById('engine-status').textContent = 'کنترل‌های داخلی: ' + (engineTest.ok ? number(engineTest.count, 0) + ' شرط عددی و حالت مرزی' : 'ناموفق') + '. این بررسی‌ها جای آزمون مستقل سخت‌افزار را نمی‌گیرند.';
-    result = E.calculate(state, moduleId); dirty = false;
+    result = E.calculate(state, moduleId, configuration.topology); dirty = false;
     if (formulaInput) formulaInput.value = '';
     var fd2 = document.getElementById('formula-description'); if (fd2) fd2.textContent = '';
     var ne2 = document.getElementById('numeric-expression'); if (ne2) ne2.textContent = '';

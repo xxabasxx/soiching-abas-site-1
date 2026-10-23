@@ -35,15 +35,17 @@ test('every module configuration pair is backed by a real engine model', () => {
     const config = { supplyType: module.supplyType || E.supplyType, topology: module.topology || E.topology };
     assert.ok(E.supportsConfiguration(config), `${module.title}: ${config.supplyType}|${config.topology}`);
   }
-  assert.equal(E.supportsConfiguration({ supplyType: 'ac-dc-isolated', topology: 'flyback-ccm' }), false);
-  assert.equal(E.supportsConfiguration({ supplyType: 'dc-dc-isolated', topology: 'flyback-dcm' }), false);
+  assert.equal(E.supportsConfiguration({ supplyType: 'ac-dc-isolated', topology: 'flyback-ccm' }), true);
+  assert.equal(E.supportsConfiguration({ supplyType: 'ac-dc-isolated', topology: 'full-bridge' }), true);
+  assert.equal(E.supportsConfiguration({ supplyType: 'dc-dc-isolated', topology: 'push-pull' }), true);
   assert.equal(E.supportsConfiguration({ supplyType: 'ac-ac', topology: 'iron-ei' }), true);
+  assert.equal(E.supportsConfiguration({ supplyType: 'ac-ac', topology: 'push-pull' }), false);
   assert.equal(E.supportsConfiguration({ supplyType: 'dc', topology: 'bldc-industrial' }), true);
 });
 
-test('unsupported topology labels are marked in the sharing options', () => {
+test('only model-backed switching topologies are enabled', () => {
   const supported = E.designOptions.topologies.filter((item) => item.supported).map((item) => item.value);
-  assert.equal(supported.join('|'), E.topology);
+  assert.equal(supported.join(','), 'flyback-dcm,flyback-ccm,forward,push-pull,half-bridge,full-bridge');
 });
 
 test('cross-parameter conflicts are rejected only inside their own section', () => {
@@ -105,6 +107,27 @@ test('Excel formulas use valid spreadsheet functions, not raw operator names', a
   for (const broken of ['MAXe', 'eMAX', 'SQRTe', 'eSQRT', '(<', 'COUNTIFe']) assert.equal(sheet.includes(broken), false, broken);
   assert.ok(sheet.includes('MAX(') || sheet.includes('SQRT('));
   assert.ok(sheet.includes('Standards!$A$5:$A$' + (E.series.length + 4)), 'E12 lookup range');
+});
+
+test('bridge family computes volt-second consistent models with honest guards', () => {
+  // Full-bridge: the duty solving must make Vsec·2·Dp exactly equal to (Vo + Vd).
+  const fb = E.calculate({ ...E.defaults, vref: 85 }, 'output', 'full-bridge');
+  assert.equal(fb.valid, true);
+  const balance = Math.abs(fb.values.brgVsec * 2 * (fb.values.brgDp / 100) - (fb.values.vo + fb.values.vd));
+  assert.ok(balance < 0.25, `volt-second balance off by ${balance}`);
+  assert.ok(fb.values.brgLo > 0 && fb.values.brgLoStd >= fb.values.brgLo);
+  assert.ok(fb.values.brgCoStd >= fb.values.brgCoRip);
+  // Push-pull stresses 2×bus; half/full-bridge stress 1×bus.
+  const pp = E.calculate({ ...E.defaults, vref: 85 }, 'switching', 'push-pull');
+  const hb = E.calculate({ ...E.defaults, vref: 39 }, 'switching', 'half-bridge');
+  assert.ok(pp.values.vdsPeak >= 2 * pp.values.rectMax, 'push-pull must clamp at 2×Vin');
+  assert.ok(hb.values.vdsPeak < 2 * hb.values.rectMax, 'half-bridge must not see 2×Vin');
+  assert.ok(pp.issues.some((i) => i.key === 'fluxWalk' && i.level === 'info'), 'flux-walking warning expected');
+  // Dead-time: ratio too high ⇒ duty fraction >48% blocks the model and the Excel export.
+  const blocked = E.calculate({ ...E.defaults, vref: 100 }, 'output', 'full-bridge');
+  assert.equal(blocked.modelValid, false);
+  assert.ok(blocked.issues.some((i) => i.key === 'brgDp' && i.level === 'error'));
+  assert.throws(() => R.workbook(blocked, { name: 'X', notes: '' }, 'output'));
 });
 
 test('engine exposes real assumptions and reachable sources for the reports', () => {

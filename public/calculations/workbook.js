@@ -76,22 +76,32 @@
   }
   function workbook(result, project, activeModule) {
     var E = global.VoltaEngine;
+    // The workbook never silently re-labels a result with another topology.
     var configuration = {
-      supplyType: project.supplyType === undefined ? E.supplyType : project.supplyType,
-      topology: project.topology === undefined ? E.topology : project.topology
+      supplyType: project.supplyType === undefined ? (result.supplyType || E.supplyType) : project.supplyType,
+      topology: project.topology === undefined ? (result.topology || E.topology) : project.topology
     };
     if (!E.supportsConfiguration(configuration)) throw new Error(tr('نوع منبع و توپولوژی انتخاب‌شده در این نسخه پشتیبانی نمی‌شود.'));
     if (!E.modules[activeModule]) throw new Error('بخش محاسباتی مشخص نشده است.');
+    if (result.topology && configuration.topology !== result.topology) {
+      throw new Error(tr('توپولوژی گزارش با توپولوژی محاسبه‌شده یکی نیست.'));
+    }
+    if (configuration.topology !== (result.topology || configuration.topology)) throw new Error(tr('توپولوژی گزارش با توپولوژی محاسبه‌شده یکی نیست.'));
     var supplyLabels = { 'ac-dc-isolated': 'AC/DC ایزوله', 'ac-ac': 'AC/AC متناوب', 'dc': 'DC / باتری' };
     var topologyLabels = {
       'flyback-dcm': 'فلای‌بک DCM',
+      'flyback-ccm': 'فلای‌بک CCM',
+      'forward': 'فوروارد تک‌سوییچ',
+      'push-pull': 'پوش-پول',
+      'half-bridge': 'نیم‌پل',
+      'full-bridge': 'تمام‌پل',
       'iron-ei': 'ترانس EI هسته آهن', 'iron-ei-ind': 'ترانس EI صنعتی Hi-B',
       'induction-motor': 'الکتروموتور القایی', 'induction-motor-ind': 'الکتروموتور صنعتی IE3/IE4',
       'bldc-general': 'موتور براشلس عمومی', 'bldc-industrial': 'موتور براشلس صنعتی'
     };
     var supplyLabel = supplyLabels[configuration.supplyType] || configuration.supplyType;
     var topologyLabel = topologyLabels[configuration.topology] || configuration.topology;
-    if (result.scope !== activeModule) result = E.calculate(result.values, activeModule);
+    if (result.scope !== activeModule) result = E.calculate(result.values, activeModule, configuration.topology);
     if (!result.valid || !result.modelValid) throw new Error('ورودی‌ها یا شرط DCM برای خروجی معتبر نیستند.');
     var sectionTitle = E.modules[activeModule].title;
     var references = {}, inputRows = heading('ABAS SOFT / ورودی‌های ' + sectionTitle, project, 'فقط ورودی‌های استفاده‌شده در این بخش. ستون D را ویرایش کنید؛ نتایج در Calculations و کنترل‌ها در Checks هستند.', ['نماد', 'پارامتر', 'واحد', 'مقدار', 'حداقل', 'حداکثر', 'توضیح']);

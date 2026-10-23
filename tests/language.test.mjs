@@ -57,7 +57,7 @@ test('all engineering labels, notes, row groups and safety assumptions have Engl
     ...E.designOptions.supplyTypes.map((item) => item.label),
     ...E.designOptions.topologies.map((item) => item.label),
     'نوع منبع و توپولوژی',
-    'مدل فعال این نسخه: AC/DC ایزوله با فلای‌بک DCM. گزینه‌های دیگر غیرفعال‌اند چون فرمول محاسباتی آن‌ها هنوز پیاده‌سازی نشده است.',
+    'شش توپولوژی با مدل عددی تأییدشده فعال‌اند: فلای‌بک DCM/CCM، فوروارد، پوش‌پول، نیم‌پل و تمام‌پل. هر گزینه فقط وقتی فعال است که مدل ریاضی و تست مرجع آن در موتور وجود داشته باشد.',
   ];
   for (const text of texts.filter(Boolean)) {
     const translated = I.t(text);

@@ -164,7 +164,7 @@ test('the flyback sections share one accent and all modules share one stylesheet
   for (const id of Object.keys(E.modules)) assert.ok(/^#[0-9a-f]{6}$/i.test(E.modules[id].accent), `accent format: ${id}`);
   const script = await readFile(new URL('../public/calculations/calculator.js', import.meta.url), 'utf8');
   new vm.Script(script, { filename: 'calculator.js' });
-  assert.ok(script.includes('E.calculate(state, moduleId)'));
+  assert.ok(script.includes('E.calculate(state, moduleId, configuration.topology)'));
   assert.ok(script.includes('plan.fields'));
   assert.equal(script.includes("setProperty('--module-accent'"), false);
   assert.ok(script.includes('prefers-reduced-motion'));
@@ -273,11 +273,13 @@ test('a row receives its content and a unique active-step frame only when reveal
 
 test('supply and topology metadata are explicit and unsupported models cannot be exported', async () => {
   assert.equal(E.supportsConfiguration({ supplyType: E.supplyType, topology: E.topology }), true);
-  assert.equal(E.supportsConfiguration({ supplyType: 'dc-dc-isolated', topology: E.topology }), false);
+  assert.equal(E.supportsConfiguration({ supplyType: 'dc-dc-isolated', topology: E.topology }), true);
+  assert.equal(E.supportsConfiguration({ supplyType: E.supplyType, topology: 'half-bridge' }), true);
   assert.equal(E.supportsConfiguration({ supplyType: E.supplyType, topology: 'llc' }), false);
-  assert.equal(E.designOptions.topologies.filter((item) => item.supported).length, 1);
+  assert.equal(E.supportsConfiguration({ supplyType: 'ac-ac', topology: 'full-bridge' }), false);
+  assert.equal(E.designOptions.topologies.filter((item) => item.supported).length, 6);
   const result = E.calculate(E.defaults, 'transformer');
-  assert.throws(() => R.workbook(result, { name: 'Wrong source', supplyType: 'dc-dc-isolated' }, 'transformer'));
+  assert.throws(() => R.workbook(result, { name: 'Wrong source', supplyType: 'ac-ac' }, 'transformer'));
   assert.throws(() => R.workbook(result, { name: 'Wrong topology', topology: 'flyback-ccm' }, 'transformer'));
   const blob = R.workbook(result, { name: 'Correct model', supplyType: E.supplyType, topology: E.topology }, 'transformer');
   const archive = await JSZip.loadAsync(await blob.arrayBuffer(), { checkCRC32: true });

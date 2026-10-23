@@ -17,9 +17,9 @@
       { value: TOPOLOGY, label: 'فلای‌بک DCM (پیکربندی فعلی)', supported: true },
       { value: 'flyback-ccm', label: 'فلای‌بک CCM', supported: true },
       { value: 'forward', label: 'فوروارد (تک‌سوییچ با سیم‌پیچ ریست)', supported: true },
-      { value: 'push-pull', label: 'پوش-پول — در نسخه بعدی', supported: false },
-      { value: 'half-bridge', label: 'نیم‌پل — در نسخه بعدی', supported: false },
-      { value: 'full-bridge', label: 'تمام‌پل — در نسخه بعدی', supported: false }
+      { value: 'push-pull', label: 'پوش-پول (مرکز‌تاب)', supported: true },
+      { value: 'half-bridge', label: 'نیم‌پل', supported: true },
+      { value: 'full-bridge', label: 'تمام‌پل', supported: true }
     ]
   };
 
@@ -31,6 +31,12 @@
     'dc-dc-isolated|flyback-ccm',
     'ac-dc-isolated|forward',
     'dc-dc-isolated|forward',
+    'ac-dc-isolated|push-pull',
+    'dc-dc-isolated|push-pull',
+    'ac-dc-isolated|half-bridge',
+    'dc-dc-isolated|half-bridge',
+    'ac-dc-isolated|full-bridge',
+    'dc-dc-isolated|full-bridge',
     'ac-ac|iron-ei',
     'ac-ac|iron-ei-ind',
     'ac-ac|induction-motor',
@@ -46,13 +52,25 @@
 
   function isForwardProject(topology) { return topology === 'forward'; }
   function isCcmProject(topology) { return topology === 'flyback-ccm'; }
+  function isBridgeProject(topology) { return topology === 'push-pull' || topology === 'half-bridge' || topology === 'full-bridge'; }
   function isFlybackFamily(topology) { return topology === 'flyback-dcm' || topology === 'flyback-ccm'; }
+  // Primary utilization per half-cycle: push-pull/full-bridge see full bus, half-bridge sees half bus.
+  function bridgePrimaryFactor(topology) { return topology === 'half-bridge' ? 0.5 : 1; }
 
   var modules = {
     input: { title: 'ورودی و یکسوساز', english: 'INPUT & RECTIFIER', subtitle: 'از برق ورودی تا یک باس DC مطمئن.', accent: '#d8a77f', summary: ['bulkStd', 'busMin', 'lineRms'] },
     transformer: { title: 'طراحی ترانسفورماتور', english: 'TRANSFORMER DESIGN', subtitle: 'از مشخصات اولیه تا هسته، سیم‌پیچ، گپ و پیشنهاد قطعه.', accent: '#d8a77f', summary: ['lp', 'np', 'ns'] },
-    switching: { title: 'سوئیچینگ و کنترل', english: 'SWITCHING & CONTROL', subtitle: 'کلید قدرت، محدودکننده جریان، اسنابر و پیشنهاد ماسفت.', accent: '#d8a77f', summary: ['vdsRating', 'senseR', 'mosLoss'] },
-    output: { title: 'فیلتر و خروجی', english: 'OUTPUT & FILTER', subtitle: 'خازن، دیود یکسوساز و پیشنهاد دیود خروجی.', accent: '#d8a77f', summary: ['coutStd', 'rippleActual', 'diodeVr'], displayKeys: { forward: ['loadR', 'fwdLo', 'fwdLoIs', 'fwdDiodeAvg', 'fwdDiodeVr', 'fwdDiodePeak', 'fwdLoRipple', 'fwdLoStd', 'fwdCoRip', 'fwdCoStep', 'fwdCoReq', 'fwdCoStd', 'fwdLoEsr', 'fwdRipTotal', 'fwdTransient', 'fwdCoVl', 'fwdFc0', 'fwdPhaseHint', 'fwdDampHint'] } },
+    switching: { title: 'سوئیچینگ و کنترل', english: 'SWITCHING & CONTROL', subtitle: 'کلید قدرت، محدودکننده جریان، اسنابر و پیشنهاد ماسفت.', accent: '#d8a77f', summary: ['vdsRating', 'senseR', 'mosLoss'], displayKeys: {
+      'push-pull': ['vdsPeak', 'vdsRating', 'mosIpk', 'brgIpkPrim', 'brgIrmsPrim', 'brgIpkLim', 'brgImag', 'mosCond', 'mosSwitch', 'mosCoss', 'mosLoss', 'sinkTheta', 'suggestedMosfet'],
+      'half-bridge': ['vdsPeak', 'vdsRating', 'mosIpk', 'brgIpkPrim', 'brgIrmsPrim', 'brgIpkLim', 'brgImag', 'mosCond', 'mosSwitch', 'mosCoss', 'mosLoss', 'sinkTheta', 'suggestedMosfet'],
+      'full-bridge': ['vdsPeak', 'vdsRating', 'mosIpk', 'brgIpkPrim', 'brgIrmsPrim', 'brgIpkLim', 'brgImag', 'mosCond', 'mosSwitch', 'mosCoss', 'mosLoss', 'sinkTheta', 'suggestedMosfet']
+    } },
+    output: { title: 'فیلتر و خروجی', english: 'OUTPUT & FILTER', subtitle: 'خازن، دیود یکسوساز و پیشنهاد دیود خروجی.', accent: '#d8a77f', summary: ['coutStd', 'rippleActual', 'diodeVr'], displayKeys: {
+      forward: ['loadR', 'fwdLo', 'fwdLoIs', 'fwdDiodeAvg', 'fwdDiodeVr', 'fwdDiodePeak', 'fwdLoRipple', 'fwdLoStd', 'fwdCoRip', 'fwdCoStep', 'fwdCoReq', 'fwdCoStd', 'fwdLoEsr', 'fwdRipTotal', 'fwdTransient', 'fwdCoVl', 'fwdFc0', 'fwdPhaseHint', 'fwdDampHint'],
+      'push-pull': ['fwdLoadR', 'brgLo', 'brgLoRipple', 'brgLoStd', 'brgLoIs', 'brgDiodeAvg', 'brgDiodeVr', 'brgDiodePeak', 'brgCoRip', 'brgCoStep', 'brgCoReq', 'brgCoStd', 'brgLoEsr', 'brgRipTotal', 'brgTransient', 'brgCoVl', 'brgFc0', 'brgPhaseHint'],
+      'half-bridge': ['fwdLoadR', 'brgLo', 'brgLoRipple', 'brgLoStd', 'brgLoIs', 'brgDiodeAvg', 'brgDiodeVr', 'brgDiodePeak', 'brgCoRip', 'brgCoStep', 'brgCoReq', 'brgCoStd', 'brgLoEsr', 'brgRipTotal', 'brgTransient', 'brgCoVl', 'brgFc0', 'brgPhaseHint'],
+      'full-bridge': ['fwdLoadR', 'brgLo', 'brgLoRipple', 'brgLoStd', 'brgLoIs', 'brgDiodeAvg', 'brgDiodeVr', 'brgDiodePeak', 'brgCoRip', 'brgCoStep', 'brgCoReq', 'brgCoStd', 'brgLoEsr', 'brgRipTotal', 'brgTransient', 'brgCoVl', 'brgFc0', 'brgPhaseHint']
+    } },
     ironcore: { title: 'محاسبات هسته آهن', english: 'IRON CORE DESIGN', subtitle: 'ترانس فرکانس شبکه؛ هسته EI، سیم‌پیچ، تلفات و پیشنهاد سایز.', accent: '#dca678', summary: ['tpv', 'npIron', 'nsIron'], basics: ['iType', 'vPrim', 'vSec', 'iSec', 'fNet'], supplyType: 'ac-ac', topology: 'iron-ei', standaloneModule: true, badge: 'IRON CORE / 50-60Hz', badgeNote: 'طراحی ترانس EI فرکانس شبکه؛ ورودی اولیه، ثانویه، جریان و فرکانس.', configNote: 'این ماژول مستقل از فلای‌بک است. ورودی‌های اختصاصی خودش را وارد کنید.', tip: 'ولتاژ اولیه، ولتاژ ثانویه، جریان ثانویه و فرکانس شبکه را وارد کنید.' },
     motor: { title: 'محاسبات الکتروموتور', english: 'MOTOR DESIGN', subtitle: 'محاسبات استاتور، روتور، گشتاور و پیشنهاد نوع موتور.', accent: '#8daeda', summary: ['torque', 'rpm', 'effMotor'], basics: ['mType', 'mVolt', 'mPower', 'mPoles', 'mFreq'], supplyType: 'ac-ac', topology: 'induction-motor', standaloneModule: true, badge: 'INDUCTION MOTOR', badgeNote: 'موتور القایی متناوب؛ ولتاژ، توان، قطب‌ها و فرکانس.', configNote: 'این ماژول مستقل است. ولتاژ تغذیه، توان، تعداد قطب و فرکانس را وارد کنید.', tip: 'نوع موتور، ولتاژ تغذیه، توان مکانیکی، تعداد قطب و فرکانس شبکه را وارد کنید.' },
     'ironcore-ind': { title: 'ترانس هسته آهن — صنعتی', english: 'IRON CORE / INDUSTRIAL', subtitle: 'ترانس صنعتی Hi-B با ضریب ایمنی بالا.', accent: '#dca678', summary: ['tpv', 'npIron', 'nsIron'], basics: ['iType', 'vPrim', 'vSec', 'iSec', 'fNet'], supplyType: 'ac-ac', topology: 'iron-ei-ind', standaloneModule: true, badge: 'IRON CORE / INDUSTRIAL', badgeNote: 'ترانس صنعتی هسته آهن EI با ورق سیلیکون Hi-B.', configNote: 'مدل صنعتی: ورق Hi-B، ضریب ایمنی ۱٫۱۵، چگالی شار ۱٫۳T.', tip: 'نوع، ولتاژ اولیه، ثانویه، جریان و فرکانس را وارد کنید.', appClassFixed: 1 },
@@ -462,6 +480,35 @@
   row('common', 'مدل Forward', 'iFwdInRMS', 'RMS جریان سوییچ Forward', 'A', 0);
   row('common', 'مدل Forward', 'fwdIpkLim', 'آستانه محدودیت جریان Forward', 'A', 0);
 
+  // --- Bridge family (push-pull / half-bridge / full-bridge), buck-derived, symmetric excitation ---
+  row('common', 'مدل پل‌ای', 'brgDp', 'دیوتی هر فاز در باس مینیمم', '%', 0);
+  row('common', 'مدل پل‌ای', 'brgDeff', 'دیوتی مؤثر خروجی (2×دیوتی فاز)', '%', 0);
+  row('common', 'مدل پل‌ای', 'brgTon', 'زمان هدایت هر فاز', 'us', 0);
+  row('common', 'مدل پل‌ای', 'brgVsec', 'ولتاژ ثانویه در زمان هدایت', 'V', 0);
+  row('common', 'مدل پل‌ای', 'brgDeltaB', 'نوسان شار آهن (ΔB قله‌به‌قله)', 'T', 0);
+  row('common', 'مدل پل‌ای', 'brgLmag', 'اندوکتانس مگنتیزینگ تخمینی', 'mH', 0);
+  row('common', 'مدل پل‌ای', 'brgImag', 'جریان مگنتیزینگ در پایان فاز', 'A', 0);
+  row('common', 'مدل پل‌ای', 'brgIpkPrim', 'پیک جریان اولیه', 'A', 0);
+  row('common', 'مدل پل‌ای', 'brgIrmsPrim', 'RMS جریان اولیه (محافظه‌کارانه)', 'A', 0);
+  row('common', 'مدل پل‌ای', 'brgIpkLim', 'آستانه محدودیت جریان پیشنهادی', 'A', 0);
+  row('common', 'مدل پل‌ای', 'brgLo', 'اندوکتانس خروجی موردنیاز', 'uH', 0);
+  row('common', 'مدل پل‌ای', 'brgLoRipple', 'ریپل جریان سلف هدف', 'A', 0);
+  row('common', 'مدل پل‌ای', 'brgLoStd', 'اندوکتانس پیشنهادی E12', 'uH', 0);
+  row('common', 'مدل پل‌ای', 'brgLoIs', 'تحمل اشباع سلف (Isat هدف)', 'A', 0);
+  row('common', 'مدل پل‌ای', 'brgDiodeAvg', 'جریان متوسط هر دیود (رکت CT)', 'A', 0);
+  row('common', 'مدل پل‌ای', 'brgDiodeVr', 'ریتینگ معکوس دیود (رکت CT)', 'V', 0);
+  row('common', 'مدل پل‌ای', 'brgDiodePeak', 'پیک تحمل لازم دیود', 'A', 0);
+  row('common', 'مدل پل‌ای', 'brgCoRip', 'ظرفیت موردنیاز از ریپل', 'uF', 0);
+  row('common', 'مدل پل‌ای', 'brgCoStep', 'ظرفیت موردنیاز از پله بار', 'uF', 0);
+  row('common', 'مدل پل‌ای', 'brgCoReq', 'ظرفیت نامی موردنیاز', 'uF', 0);
+  row('common', 'مدل پل‌ای', 'brgCoStd', 'ظرفیت نامی پیشنهادی E12', 'uF', 0);
+  row('common', 'مدل پل‌ای', 'brgLoEsr', 'سقف ESR خازن از بودجه ریپل', 'mohm', 0);
+  row('common', 'مدل پل‌ای', 'brgRipTotal', 'ریپل خروجی برآوردی کل', 'mV pp', 0);
+  row('common', 'مدل پل‌ای', 'brgTransient', 'افت برآوردی پله بار', 'mV', 0);
+  row('common', 'مدل پل‌ای', 'brgCoVl', 'ریتینگ ولتاژ خازن خروجی', 'V', 0);
+  row('common', 'مدل پل‌ای', 'brgFc0', 'فرکانس رزونانس LC خروجی', 'Hz', 0);
+  row('common', 'مدل پل‌ای', 'brgPhaseHint', 'فرکانس صفر ESR (راهنمای حاشیه فاز)', 'Hz', 0);
+
   function referencesOf(expr) {
     if (typeof expr === 'string') return [expr];
     if (!Array.isArray(expr)) return [];
@@ -515,6 +562,7 @@
     if (moduleId !== 'input' && !isStandalone) {
       if (topology === 'forward') ['bLimit', 'dDemagF'].forEach(include);
       else if (topology === 'flyback-ccm') ['dOn', 'dDemagC', 'dSumC', 'dIdleC', 'bLimit'].forEach(include);
+      else if (isBridgeProject(topology)) ['bNormal'].forEach(include);
       else ['idle', 'designIdle', 'designIdleWorst', 'bLimit'].forEach(include);
     }
     var displayKeySet = displayRows.map(function (r) { return r.key; });
@@ -641,6 +689,7 @@
     // --- Topology application-layer: reshape only the values the chosen model owns ---
     var isFwd = isForwardProject(topology);
     var isCcm = isCcmProject(topology);
+    var isBrg = isBridgeProject(topology);
     var isDcm = topology === TOPOLOGY;
 
     // CCM owns a fixed turns ratio Np/Ns = Vref/(Vo+Vd); the turn solver defines np, ns comes from it.
@@ -648,8 +697,8 @@
       values.ratio = values.vref / (values.vo + values.vd);
       if (Number.isFinite(values.np)) values.ns = Math.max(1, Math.round(values.np / values.ratio));
     }
-    // Forward owns the same ratio but solves ns first, then np.
-    if (isFwd && Number.isFinite(values.vref) && Number.isFinite(values.vo) && Number.isFinite(values.vd)) {
+    // Forward and bridge family share the same ratio semantics (Np/Ns from the reflected target).
+    if ((isFwd || isBrg) && Number.isFinite(values.vref) && Number.isFinite(values.vo) && Number.isFinite(values.vd)) {
       values.ratio = values.vref / (values.vo + values.vd);
       if (Number.isFinite(values.ns)) values.np = Math.max(1, Math.ceil(values.ns * values.ratio));
     }
@@ -661,24 +710,25 @@
 
     if (isCcm && !activeModule.standaloneModule) {
       var ratioCcm = Number.isFinite(values.ratio) ? values.ratio : 0;
+      // Re-derive the CCM turns after evaluation so the duty/inductance use this topology's ratio.
+      var vReqC = (Number.isFinite(values.vo) ? values.vo : 0) + (Number.isFinite(values.vd) ? values.vd : 0);
+      if (Number.isFinite(values.vref) && vReqC > 0 && Number.isFinite(values.np)) {
+        ratioCcm = values.vref / vReqC;
+        values.ns = Math.max(1, Math.round(values.np / ratioCcm));
+        values.ratio = values.np / values.ns;
+        ratioCcm = values.ratio;
+      }
       var solveCcm = Number.isFinite(values.busMin) && Number.isFinite(values.fHz) && Number.isFinite(values.pin) && ratioCcm > 0;
       var dCCM = 0, lpCCM = 0;
       if (solveCcm) {
-        // Closed form on the CCM boundary (K_RP = 1): Lp(D)=Vmin*D^2/(Pin*f*(2-D))
-        var lo = 1e-7, hi = 0.499, span = (hi - lo) / 24000, bestLp = 0, bestD = 0, bestErr = Infinity;
-        for (var dGuess = lo; dGuess < hi; dGuess += span) {
-          var denom = values.pin * values.fHz * (2 - dGuess);
-          if (denom <= 0) continue;
-          var lpGuess = values.busMin * dGuess * dGuess / denom;
-          var krpGuess = (1 - dGuess) * values.busMin * dGuess / (values.pin * values.fHz * lpGuess);
-          var err = Math.abs(krpGuess - 1);
-          if (err < bestErr) { bestErr = err; bestD = dGuess; bestLp = lpGuess; }
-          if (krpGuess <= 1) break;
-        }
-        dCCM = bestD; lpCCM = bestLp;
+        // CCM closed form: volt-second balance D = nVo′/(Vmin + nVo′), boundary K_RP = 1 ⇒ Lp = (Vmin·D)²/(2·Pin·f)
+        var refl = ratioCcm * (values.vo + values.vd);
+        dCCM = refl / (values.busMin + refl);
+        lpCCM = dCCM > 0 ? (values.busMin * values.busMin * dCCM * dCCM) / (2 * values.pin * values.fHz) : 0;
       }
       var iavgBus = solveCcm ? values.pin / values.busMin : 0;
-      var ipkCCM = solveCcm && dCCM > 0 ? (iavgBus * 2) / (dCCM * (2 - 1)) : 0;
+      var iavgTon = solveCcm && dCCM > 0 ? iavgBus / dCCM : 0;
+      var ipkCCM = 2 * iavgTon; // boundary: ΔI = 2·Iavg(Ton) ⇒ Ipk = 2·Iavg(Ton)
       var ipRmsCcm = ipkCCM * Math.sqrt(Math.max(0, dCCM / 3));
       var isRmsCcm = solveCcm && values.ratio > 0 ? ipkCCM * values.ratio * Math.sqrt(Math.max(0, (1 - dCCM) / 3)) : 0;
       var stampCcm = {
@@ -816,26 +866,100 @@
       values.secondaryMean = values.isPeak * (1 - dF) / 2;
     }
 
-    // --- Controls after stamping-and-validation ---
-    var countStamp = 0;
-    plan.rows.forEach(function (r, idx) {
-      var val = values[r.key];
-      var noteText = r.note || '';
-      if (r.key === 'bridgeRec') noteText = bridgeRec;
-      if (r.key === 'suggestedCore') noteText = suggestedCore;
-      if (r.key === 'suggestedMosfet') noteText = suggestedMosfet;
-      if (r.key === 'suggestedDiode') noteText = suggestedDiode;
-      if (r.key === 'suggestedEI') noteText = suggestedEI;
-      if (r.key === 'suggestedBLDC') noteText = suggestedBLDC;
-      if (r.key === 'suggestedMotor') noteText = suggestedMotor;
-      computed[countStamp++] = Object.assign({}, r, {
-        value: typeof val === 'number' && Number.isFinite(val) ? val : 0,
-        note: noteText,
-        formula: formula(r.expr, symbols)
-      });
-    });
+    if (isBrg && !activeModule.standaloneModule) {
+      // Bridge family: symmetric excitation, buck-derived. Each phase conducts D_p of T;
+      // the rectified secondary therefore works at 2×fs and Vo = 2·D_p·Vsec.
+      var kPrim = bridgePrimaryFactor(topology); // 1 = push-pull & full-bridge, 0.5 = half-bridge
+      var vReq0 = (Number.isFinite(values.vo) ? values.vo : 0) + (Number.isFinite(values.vd) ? values.vd : 0);
+      // The shared turn rows are topology-aware too: re-derive the bridge turns AFTER evaluation.
+      if (Number.isFinite(values.vref) && vReq0 > 0 && Number.isFinite(values.ns)) {
+        var ratioBrg = values.vref / vReq0;
+        values.np = Math.max(1, Math.ceil(values.ns * ratioBrg));
+        values.ratio = values.np / values.ns;
+      }
+      var ratioB = Number.isFinite(values.ratio) ? values.ratio : 0;
+      var solveB = Number.isFinite(values.busMin) && Number.isFinite(values.rectMax) && Number.isFinite(values.fHz)
+        && Number.isFinite(values.vo) && Number.isFinite(values.io) && Number.isFinite(values.vd) && ratioB > 0;
+      var vReq = values.vo + values.vd;
+      var dPb = solveB ? (vReq * ratioB) / (2 * kPrim * values.busMin) : 0;
+      var vSecOn = dPb > 0 ? vReq / (2 * dPb) : 0; // = kPrim·Vin/ratio, written against the requested duty
+      var isPushPull = topology === 'push-pull';
+      var iOutB = values.io;
+      var rippleAB = 0.3 * Math.max(0.1, iOutB);
+      var ipkPrimB = dPb > 0 ? (iOutB + rippleAB / 2) / ratioB : 0;
+      // Primary RMS: push-pull half-windings carry only their own phase; bridges carry both ⇒ use √(2D_p) conservatively.
+      var iRmsPrimB = ipkPrimB * Math.sqrt(Math.max(1e-6, 2 * dPb));
+      var loH = solveB && dPb > 0 && dPb < 0.5 ? (values.vo * (0.5 - dPb) * (values.period || 0) * 1e-6) / rippleAB : 0;
+      var rippleBudgetB = values.vo * values.rippleOut * 10; // mV
+      var stepIB = values.io * (values.stepLoad / 100);
+      var droopVB = values.vo * (values.droop / 100);
+      var shareB = Math.max(0.1, (values.capShare || 50) / 100);
+      var vdsPeakB = isPushPull ? 2 * values.rectMax + (values.spike || 0) : values.rectMax + (values.spike || 0);
+      var npSym = Number.isFinite(values.np) ? values.np : 0;
+      var aeSym = Number.isFinite(values.ae) ? values.ae * 1e-6 : 0;
+      var leSym = Number.isFinite(values.le) ? values.le * 1e-3 : 0;
+      var dBpk = solveB && npSym > 0 && aeSym > 0 ? (kPrim * values.busMin * dPb) / (values.fHz * npSym * aeSym) : 0;
+      var lmagH = (npSym > 0 && aeSym > 0 && leSym > 0) ? (4e-7 * Math.PI * (values.mur || 2000) * npSym * npSym * aeSym) / leSym : 0;
+      var imagB = lmagH > 0 ? (kPrim * values.busMin * dPb) / (values.fHz * lmagH) : 0;
+      var stampB = {
+        brgDp: dPb * 100,
+        brgDeff: 2 * dPb * 100,
+        brgTon: dPb * (values.period || 0),
+        brgVsec: vSecOn,
+        brgDeltaB: dBpk,
+        brgLmag: lmagH * 1000,
+        brgImag: imagB,
+        brgIpkPrim: ipkPrimB,
+        brgIrmsPrim: iRmsPrimB,
+        brgIpkLim: ipkPrimB * (1 + (values.oc || 0) / 100),
+        brgLo: loH * 1e6,
+        brgLoRipple: rippleAB,
+        brgLoIs: (iOutB + rippleAB / 2) * 1.25,
+        brgDiodeAvg: iOutB / 2 * 1.4,
+        brgDiodePeak: (iOutB + rippleAB / 2) * 1.25,
+        brgLoEsr: rippleBudgetB > 0 ? (rippleBudgetB * (1 - shareB)) / Math.max(1e-9, rippleAB) : 0,
+        brgCoVl: values.vo * (1 + (values.voltMargin || 0) / 100),
+        ipDesign: ipkPrimB,
+        ipOp: ipkPrimB,
+        ipLimit: ipkPrimB * (1 + (values.oc || 0) / 100),
+        vdsPeak: vdsPeakB,
+        vdsRating: vdsPeakB * (1 + (values.voltMargin || 0) / 100),
+        mosIpk: ipkPrimB * 1.25,
+        mosCond: iRmsPrimB * iRmsPrimB * (values.rds || 0),
+        mosSwitch: 0.5 * vdsPeakB * ipkPrimB * ((values.tr || 0) + (values.tf || 0)) * 1e-9 * (values.fHz || 0),
+        mosCoss: values.coss ? 0.5 * values.coss * 1e-12 * vdsPeakB * vdsPeakB * (values.fHz || 0) : 0,
+        bNormal: dBpk / 2,
+        fwdLoadR: values.vo > 0 && values.io > 0 ? values.vo / values.io : 0
+      };
+      stampB.mosLoss = stampB.mosCond + stampB.mosSwitch + stampB.mosCoss;
+      stampB.sinkTheta = stampB.mosLoss > 0 ? (((values.tj || 0) - (values.ta || 0)) / stampB.mosLoss) - (values.rjc || 0) - (values.rcs || 0) : 0;
+      stampB.brgLoStd = preferred(stampB.brgLo);
+      // Output capacitor at 2×fs ripple frequency:
+      stampB.brgCoRip = solveB && rippleBudgetB > 0 && values.fHz > 0 ? (rippleAB * 1e9) / (8 * 2 * values.fHz * rippleBudgetB * shareB) : 0;
+      stampB.brgCoStep = droopVB > 0 ? 2.5 * stepIB * (values.responseUs || 0) / droopVB : 0;
+      stampB.brgCoReq = Math.max(stampB.brgCoRip, stampB.brgCoStep) / Math.max(0.2, 1 - (values.outTol || 0) / 100);
+      stampB.brgCoStd = preferred(stampB.brgCoReq);
+      stampB.brgDiodeVr = solveB ? (2 * kPrim * values.rectMax / ratioB) * (1 + (values.voltMargin || 0) / 100) : 0;
+      stampB.brgRipTotal = stampB.brgCoStd > 0 && values.fHz > 0 ? (rippleAB * 1e9) / (8 * 2 * values.fHz * (stampB.brgCoStd * (1 - (values.outTol || 0) / 100))) : 0;
+      stampB.brgTransient = stampB.brgCoStd > 0 ? (stepIB * (values.responseUs || 0) * 1e-6) / (stampB.brgCoStd * 1e-6) * 1000 + stepIB * ((values.esr || 0) / 1000) * 1000 : 0;
+      stampB.brgFc0 = stampB.brgLoStd > 0 && stampB.brgCoStd > 0 ? 1 / (2 * Math.PI * Math.sqrt(stampB.brgLoStd * 1e-6 * stampB.brgCoStd * 1e-6)) : 0;
+      stampB.brgPhaseHint = stampB.brgLoEsr > 0 && stampB.brgCoStd > 0 ? 1 / (2 * Math.PI * (stampB.brgLoEsr * 1e-3) * (stampB.brgCoStd * 1e-6)) : 0;
+      var ownedB = [
+        'brgDp', 'brgDeff', 'brgTon', 'brgVsec', 'brgDeltaB', 'brgLmag', 'brgImag',
+        'brgIpkPrim', 'brgIrmsPrim', 'brgIpkLim',
+        'brgLo', 'brgLoStd', 'brgLoRipple', 'brgLoIs', 'brgDiodeAvg', 'brgDiodeVr', 'brgDiodePeak',
+        'brgLoEsr', 'brgCoRip', 'brgCoStep', 'brgCoReq', 'brgCoStd', 'brgRipTotal', 'brgTransient', 'brgCoVl', 'brgFc0', 'brgPhaseHint',
+        'ipDesign', 'ipOp', 'ipLimit', 'vdsPeak', 'vdsRating', 'mosIpk', 'mosCond', 'mosSwitch', 'mosCoss', 'mosLoss', 'sinkTheta', 'bNormal', 'fwdLoadR'
+      ];
+      ownedB.forEach(function (keyB) { if (Number.isFinite(stampB[keyB])) values[keyB] = stampB[keyB]; });
+      values.designIdle = 1; values.designIdleWorst = 1; values.idle = 1;
+      values.isPeak = ipkPrimB * ratioB;
+      values.isRms = values.isPeak * Math.sqrt(Math.max(0, 2 * dPb));
+      values.capRms = Math.sqrt(Math.max(0, values.isRms * values.isRms - values.io * values.io));
+      values.secondaryMean = values.isPeak * 2 * dPb;
+    }
 
-// --- قیود میان‌پارامتری: فقط وقتی اعمال می‌شوند که همه کلیدها در دامنه همین بخش باشند ---
+    // --- قیود میان‌پارامتری: فقط وقتی اعمال می‌شوند که همه کلیدها در دامنه همین بخش باشند ---
     function inScope() { for (var i = 0; i < arguments.length; i++) if (!Number.isFinite(values[arguments[i]])) return false; return true; }
     function domainError(cond, fieldKey, message) { if (cond && !errors[fieldKey]) errors[fieldKey] = message; }
 
@@ -853,8 +977,8 @@
     // --- کنترل‌های مدل: هشدارها و خطاهای سطح طراحی (فقط در دامنه همین بخش) ---
     function modelIssue(cond, level, key, message) { if (cond) issues.push({ level: level, key: key, text: message }); }
 
-    if (inScope('idle') && !isCcm) modelIssue(!isFwd && values.idle < 2, 'error', 'idle', 'حاشیه بی‌جریانی در بار نامی کمتر از ۲٪ است؛ مبدل در آستانه CCM قرار دارد — توان، فرکانس یا نقطه کار را اصلاح کنید.');
-    if (inScope('designIdleWorst') && !isCcm) modelIssue(!isFwd && values.designIdleWorst < 5, 'error', 'designIdleWorst', 'شرط DCM در بودجه توان و بدترین تلرانس Lp برقرار نیست؛ دیوتی طراحی یا ولتاژ بازتابی هدف را اصلاح کنید');
+    if (inScope('idle') && isDcm) modelIssue(values.idle < 2, 'error', 'idle', 'حاشیه بی‌جریانی در بار نامی کمتر از ۲٪ است؛ مبدل در آستانه CCM قرار دارد — توان، فرکانس یا نقطه کار را اصلاح کنید.');
+    if (inScope('designIdleWorst') && isDcm) modelIssue(values.designIdleWorst < 5, 'error', 'designIdleWorst', 'شرط DCM در بودجه توان و بدترین تلرانس Lp برقرار نیست؛ دیوتی طراحی یا ولتاژ بازتابی هدف را اصلاح کنید');
 
     if (inScope('bLimit', 'bmax')) modelIssue(values.bLimit > values.bmax * 1.001, 'error', 'bLimit', 'چگالی شار در حد جریان از سقف طراحی عبور می‌کند؛ دور اولیه یا سطح مؤثر هسته را افزایش دهید.');
     if (inScope('fill', 'ku')) modelIssue(values.fill > values.ku, 'warning', 'fill', 'پرشدگی مس از حد مجاز پنجره بیشتر است؛ هسته بزرگ‌تر، سیم نازک‌تر یا تعداد رشته کمتر لازم است.');
@@ -872,6 +996,21 @@
     if (isFwd && Number.isFinite(values.resetMargin)) {
       if (values.resetMargin <= 0) issues.push({ level: 'error', key: 'resetMargin', text: 'دیوتی بیش از ۵۰٪ است؛ سیم‌پیچ ریست ۱:۱ هسته را ریست نمی‌کند — np/ns کوچک‌تر یا ورودی بزرگ‌تر.' });
       else if (values.resetMargin < 5) issues.push({ level: 'warning', key: 'resetMargin', text: 'حاشیه ریست بسیار کم است؛ بررسی چیدمان سیم‌پیچ ریست.' });
+    }
+    if (isBrg) {
+      var dPbChk = Number.isFinite(values.brgDp) ? values.brgDp / 100 : 0;
+      if (dPbChk >= 0.48) issues.push({ level: 'error', key: 'brgDp', text: 'دیوتی فاز از سقف مرده‌زمان (۴۸٪) بیشتر است؛ نسبت دور (ولتاژ بازتابی هدف) را کمتر یا ولتاژ ورودی را بیشتر کنید.' });
+      else if (dPbChk > 0.42) issues.push({ level: 'warning', key: 'brgDp', text: 'دیوتی فاز به سقف مرده‌زمان نزدیک است؛ حاشیه برای تنظیم بار کم می‌شود.' });
+      if (Number.isFinite(values.brgDeltaB) && Number.isFinite(values.bmax) && values.brgDeltaB / 2 > values.bmax) {
+        issues.push({ level: 'error', key: 'brgDeltaB', text: 'پیک شار از سقف طراحی عبور می‌کند؛ دور اولیه یا سطح مؤثر هسته را افزایش دهید.' });
+      }
+      if (topology === 'push-pull') {
+        issues.push({ level: 'info', key: 'fluxWalk', text: 'پوش‌پول به رانش شار (flux walking) حساس است؛ کنترل جریان‌مد با کلمپ فاز‌به‌فاز توصیه می‌شود. تش سوییچ ۲×Vin است.' });
+      }
+      var rippleBudgetB2 = Number.isFinite(values.vo) && Number.isFinite(values.rippleOut) ? values.vo * values.rippleOut * 10 : 0;
+      if (Number.isFinite(values.brgRipTotal) && rippleBudgetB2 > 0 && values.brgRipTotal > rippleBudgetB2) {
+        issues.push({ level: 'warning', key: 'brgRipTotal', text: 'ریپل برآوردی از بودجه ریپل خروجی بیشتر است؛ ظرفیت مؤثر یا ESR کمتر لازم است.' });
+      }
     }
     var modelValid = !issues.some(function (issue) { return issue.level === 'error'; });
     if (isCcm && Number.isFinite(values.rhpzKhz) && Number.isFinite(values.fs) && values.rhpzKhz < values.fs / 1000 * 0.5) {
@@ -1002,6 +1141,8 @@
       valid: true,
       modelValid: modelValid,
       scope: plan.id,
+      topology: topology,
+      supplyType: activeModule.standaloneModule ? (activeModule.supplyType || SUPPLY_TYPE) : SUPPLY_TYPE,
       fields: plan.fields,
       values: values,
       errors: {},
@@ -1055,6 +1196,43 @@
     pass('esr-droop-block', calculate(Object.assign({}, defaults, { esr: 500 }), 'output').valid === false);
     pass('unrelated-ignored', calculate(Object.assign({}, defaults, { esr: 500 }), 'transformer').valid === true);
     pass('cout-consistent', v.coutEff <= v.coutStd && v.coutEff > v.coutStd * 0.5);
+    pass('ccm-model-stamps', (function () {
+      var c = calculate(defaults, 'transformer', 'flyback-ccm');
+      if (!c.valid) return false;
+      var e = 0.5 * (c.values.lp * 1e-6) * Math.pow(c.values.ipkC, 2) * c.values.fHz;
+      return Number.isFinite(c.values.lp) && c.values.lp > 0 && Number.isFinite(c.values.ipkC) && c.values.ipkC > 0
+        && Math.abs(c.values.dOn + c.values.dDemag - 100) < 0.2
+        && Math.abs(e - c.values.pin) < 0.2 * c.values.pin;
+    })());
+    pass('forward-model-stamps', (function () {
+      var f = calculate(defaults, 'switching', 'forward');
+      if (!f.valid) return false;
+      var co = calculate(defaults, 'output', 'forward');
+      return f.values.vdsPeak >= 2 * f.values.rectMax && f.values.resetMargin > 0 && f.values.dF <= 50
+        && co.valid && co.values.fwdCoStd >= co.values.fwdCoRip && co.values.fwdLo > 0;
+    })());
+    pass('topology-registry', supportsConfiguration({ supplyType: 'ac-dc-isolated', topology: 'flyback-ccm' })
+      && supportsConfiguration({ supplyType: 'dc-dc-isolated', topology: 'forward' })
+      && supportsConfiguration({ supplyType: 'ac-dc-isolated', topology: 'push-pull' })
+      && supportsConfiguration({ supplyType: 'dc-dc-isolated', topology: 'half-bridge' })
+      && !supportsConfiguration({ supplyType: 'ac-ac', topology: 'push-pull' })
+      && !supportsConfiguration({ supplyType: 'ac-dc-isolated', topology: 'llc' }));
+    pass('bridge-models-physics', (function () {
+      // Full-bridge reference: vref=85 ⇒ ratio ≈ 6.8 and Vsec·Io·2Dp = Psec within 2%.
+      var fb = calculate(Object.assign({}, defaults, { vref: 85 }), 'output', 'full-bridge');
+      if (!fb.valid) return false;
+      var expectedDp = (fb.values.vo + fb.values.vd) * fb.values.ratio / (2 * 1 * fb.values.busMin);
+      var dutyOk = Math.abs(fb.values.brgDp / 100 - expectedDp) < 0.01;
+      var energyOk = Math.abs(fb.values.brgVsec * fb.values.io * 2 * (fb.values.brgDp / 100) - fb.values.psec) < 0.02 * Math.max(1, fb.values.psec);
+      if (!dutyOk || !energyOk || !(fb.values.brgLo > 0) || !(fb.values.brgLoStd >= fb.values.brgLo) || !(fb.values.brgCoStd >= fb.values.brgCoRip)) return false;
+      var pp = calculate(Object.assign({}, defaults, { vref: 85 }), 'switching', 'push-pull');
+      var hb = calculate(Object.assign({}, defaults, { vref: 39 }), 'switching', 'half-bridge');
+      if (!pp.valid || !hb.valid) return false;
+      var stressOk = pp.values.vdsPeak >= 2 * pp.values.rectMax && hb.values.vdsPeak >= hb.values.rectMax && hb.values.vdsPeak < 2 * hb.values.rectMax;
+      var blocked = calculate(Object.assign({}, defaults, { vref: 100 }), 'output', 'full-bridge');
+      var deadTimeOk = blocked.modelValid === false && blocked.issues.some(function (i) { return i.key === 'brgDp' && i.level === 'error'; });
+      return stressOk && deadTimeOk;
+    })());
     pass('bldc-model', (function () { var b = calculate(defaults, 'bldc'); return b.valid && b.values.backEMF > 0 && b.values.backEMF <= b.values.bldcVbus; })());
     pass('standalone-scope', (function () { var i = calculate(defaults, 'ironcore'); return i.valid && i.rows.every(function (r) { return r.module === 'ironcore'; }); })());
     return { ok: failures.length === 0, count: run, failures: failures };
